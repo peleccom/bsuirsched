@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block content %}
+<p class="well" style="text-align: center;">
+    Расписание группы <em> {{group}} </em>
+</p>
+<table class="table table-bordered table-condensed table-striped table-hover">
+{% for day in week %}
+{% if forloop.first %}
+<thead>
+<tr><th></th><th>Недели</th><th>Время</th><th>Подгр.</th><th>Предмет</th><th>Тип</th><th>Аудит.</th><th>Преподаватель</th></tr>
+</thead>
+{% endif %}
+<tr>
+  <td>{{ day.getname }}</td>
+  <td>
+    {% for lesson in day  %}
+        <div>
+        {{ lesson.getweeks }} <br>
+        </div>
+    {% endfor %}
+  </td>
+  <td>
+    {% for lesson in day  %}
+        <div>
+        {{ lesson.gettime }} <br>
+        </div>
+    {% endfor %}
+  </td>
+  <td>
+    {% for lesson in day  %}
+        <div>
+        {{ lesson.getsubgroup }} <br>
+        </div>
+    {% endfor %}
+  </td>
+  <td>
+    {% for lesson in day  %}
+        <div>
+        {{ lesson.getsubject }} <br>
+        </div>
+    {% endfor %}
+  </td>
+  <td>
+    {% for lesson in day  %}
+        <div>
+        {{ lesson.getlessontype }} <br>
+        </div>
+    {% endfor %}
+  </td>
+  <td>
+    {% for lesson in day  %}
+        <div>
+        {{ lesson.getplace }} <br>
+        </div>
+    {% endfor %}
+  </td>
+  <td>
+    {% for lesson in day  %}
+        <div>
+        {{ lesson.getlecturer }} <br>
+        </div>
+    {% endfor %}
+  </td>
+
+</tr>
+{% endfor %}
+</table>
+<br>
+<div class="row">
+    <div class="container">
+       <form action="" method="get" class="form-inline" style="border:1px solid #DDD;">
+        <legend>Получить расписание для конкретной недели</legend>
+    <input type="hidden" name="group" value="{{ group }}">
+    <input type="hidden" name="subgroup" value="{{ subgroup|default:'' }}"> 
+    {% for weeknumber in weeknumbers  %}
+        <label class="radio inline">
+        <input type="radio" name="week" id="optionsRadios" value="{{ weeknumber }}">
+         {{ weeknumber }}
+        </label>
+    {% endfor %}
+    <input type="submit" value="На неделю">
+</form> 
+</div>
+</div>
+
+{% endblock content %}

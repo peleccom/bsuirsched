@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+    <form action="" method="get" class="form-search">
+    <label for="group">Введите номер группы</label>    
+   <input type="text" name="group" id="">
+      <select name="subgroup" id="">
+       <option value="0">Все</option>
+       <option value="1">1</option>
+       <option value="2">2</option>
+   </select>
+   <input type="submit" value="Получить расписание">
+    </form>
+{% endblock content %}
