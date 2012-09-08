@@ -155,11 +155,14 @@ class StudyDay(object):
             return self
         newlessons0 = []
         newlessons = []
-        for lesson in self:
-            sb = lesson.getsubgroup()
-            # print wk, week
-            if not sb or sb == subgroup :
-                newlessons0.append(lesson)
+        if subgroup:
+            for lesson in self:
+                sb = lesson.getsubgroup()
+                # print wk, week
+                if not sb or sb == subgroup :
+                    newlessons0.append(lesson)
+        else:
+            newlessons0=[lesson for lesson in self]
         if week:
             for lesson in newlessons0:
                 wk = lesson._weeks
