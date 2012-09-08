@@ -22,6 +22,7 @@ class MainPage(webapp2.RequestHandler):
                                 'templates', 'schedule.html')
                 self.response.out.write(template.render(path, {"week": parsed,
                                         "group": group, "subgroup": subgroup,
+                                        "selweek": week,
                                         "weeknumbers": range(1,5)})
                                         )
             else:
