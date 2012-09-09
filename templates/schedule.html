@@ -2,6 +2,14 @@
 {% block content %}
 <p class="well" style="text-align: center;">
     Расписание группы <em> {{group}} </em>
+{% if subgroup != "0" %}
+<br>
+Подгруппа {{ subgroup }}
+{% endif %}
+{% if selweek != "0" and selweek%}
+<br>
+Неделя {{ selweek }}  
+{% endif %}
 </p>
 <table class="table table-bordered table-condensed table-striped table-hover">
 {% for day in week %}
