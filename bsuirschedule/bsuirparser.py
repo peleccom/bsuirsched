@@ -5,14 +5,27 @@
 from lxml import etree
 import models
 import urllib
+import urllib2
 
 
-def parse(group, needsubgroup=None, needweek=None):
-    parser = etree.HTMLParser(encoding="utf8")
-    url = "http://www.bsuir.by/psched/schedulegroup?group=%s" % group
-    rawhtml = urllib.urlopen(url).read()
-    root = etree.HTML(rawhtml, parser=parser)
-    table = root.xpath(".//*[@id='tableZone']/table")
+def fetch(group):
+    try:
+        parser = etree.HTMLParser(encoding="utf8")
+        url = "http://www.bsuir.by/psched/schedulegroup?group=%s" % group
+        rawhtml = urllib.urlopen(url).read()
+        root = etree.HTML(rawhtml, parser=parser)
+        table = root.xpath(".//*[@id='tableZone']/table")
+        if table:
+            return etree.tostring(table[0], encoding="unicode")
+        else:
+            return None
+    except Exception, e:
+        return None
+
+
+def parse(tablestring, needsubgroup=None, needweek=None):
+    root = etree.HTML(tablestring)
+    table = root.xpath(".//table")
     if not table:
         return None
     if needsubgroup:
