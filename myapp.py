@@ -35,8 +35,10 @@ class MainPage(webapp2.RequestHandler):
         else:
             rawtable = fetchrawtable(group)
             if not rawtable:
-                self.response.headers['Content-Type'] = 'text/plain'
-                self.response.out.write(u"Не удалось получить расписание")
+                path = os.path.join(os.path.dirname(__file__),
+                                    'templates', 'erroratbsuir.html')
+                self.response.out.write(template.render(path,
+                                        {'group': group}))
                 return
             parsed = bsuirparser.parse(rawtable, subgroup, week)
             if parsed:
