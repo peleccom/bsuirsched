@@ -8,6 +8,8 @@ from google.appengine.api import memcache
 from bsuirschedule import bsuirparser
 
 
+MAX_CACHING_TIME =5* 24 * 60 * 60
+
 def fetchrawtable(group):
     data = memcache.get(group)
     if data is not None:
@@ -17,7 +19,7 @@ def fetchrawtable(group):
         data = bsuirparser.fetch(group)
         if not data:
             return None
-        memcache.set(group, data, 24 * 60 * 60)
+        memcache.set(group, data, MAX_CACHING_TIME)
         logging.info("Get new data for %s and save to cache" % group)
         return data
 

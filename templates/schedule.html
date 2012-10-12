@@ -78,8 +78,8 @@
     <div class="container">
        <form action="" method="get" class="form-inline" style="border:1px solid #DDD;">
         <legend>Получить расписание для конкретной недели</legend>
-    <input type="hidden" name="group" value="{{ group }}">
-    <input type="hidden" name="subgroup" value="{{ subgroup|default:'' }}"> 
+    <input name="group" value="{{ group }}">
+    <input  name="subgroup" value="{{ subgroup|default:'' }}"> 
     {% for weeknumber in weeknumbers  %}
         <label class="radio inline">
         <input type="radio" name="week" id="optionsRadios" value="{{ weeknumber }}">
