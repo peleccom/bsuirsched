@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
+import datetime
 
 class Lecturer(object):
     def __init__(self, name):
@@ -198,3 +199,14 @@ class StudyWeek(object):
         for day in self:
             s += unicode(day) + "\n"
         return s
+    
+    @staticmethod
+    def getweeknum(year, month, day):
+        '''Return week number'''
+        startday = datetime.date(2012, 9, 1)
+        newweek = datetime.date(year, month, day).isocalendar()[1]
+        startweek = startday.isocalendar()[1]
+        return ((newweek - startweek) % 4) +1
+
+
+
