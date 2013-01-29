@@ -23,25 +23,24 @@ def fetchrawtable(group):
         q = GroupSchedule.all()
         q.filter("group = ", str(group))
         results = q.fetch(1)
-        logging.debug("Fetching from DB")
         if results:
             schedule = results[0]
             if (datetime.datetime.now() - schedule.date).total_seconds() < MAX_DB_TIME:
                 # в БД
                 memcache.set(group, schedule.text, MAX_CACHING_TIME)
-                logging.info("Get data for %s from db and save to cache" % group)
+                logging.debug("Get data for %s from db and save to cache" % group)
                 return schedule.text
             else:
                 # в БД просрочено, попытка нового запроса
                 data = bsuirparser.fetch(group)
                 if not data:
                     memcache.set(group, schedule.text, MAX_CACHING_TIME)
-                    logging.info("Data in DB is too old, but site isn't respond %s save to cache" % group)
+                    logging.debug("Data in DB is too old, but site isn't respond %s save to cache" % group)
                     return schedule.text
                 else:
                     schedule.delete()
                     memcache.set(group, data, MAX_CACHING_TIME)
-                    logging.info("Get new data for %s and save to cache" % group)
+                    logging.debug("Get new data for %s and save to cache" % group)
                     GroupSchedule(group=group, text=data).put()
                     return data
 
@@ -50,12 +49,13 @@ def fetchrawtable(group):
         else: # нет в БД
             data = bsuirparser.fetch(group)
             if not data:
-                logging.info("Fetching %s failed" % group)
+                logging.error("Fetching %s failed" % group)
                 return None
             memcache.set(group, data, MAX_CACHING_TIME)
-            logging.info("Get new data for %s and save to cache" % group)
+            logging.debug("Get new data for %s and save to cache" % group)
             GroupSchedule(group=group, text=data).put()
             return data
+
 
 
 class MainPage(webapp2.RequestHandler):
@@ -85,7 +85,6 @@ class GroupSchedulePage(webapp2.RequestHandler):
             if parsed:
                 path = os.path.join(os.path.dirname(__file__),
                                     'templates', 'schedule.html')
-                logging.debug(parsed)
                 self.response.out.write(template.render(path, {"week": parsed,
                                         "group": group, "subgroup": subgroup,
                                         "selweek": week,

@@ -22,54 +22,39 @@
   <td>{{ day.getname }}</td>
   <td>
     {% for lesson in day  %}
-        <div>
-        {{ lesson.getweeks }} <br>
-        </div>
+        <div>{{ lesson.getweeks }}<br></div>
     {% endfor %}
   </td>
   <td>
     {% for lesson in day  %}
-        <div>
-        {{ lesson.gettime }} <br>
-        </div>
+        <div>{{ lesson.gettime }}<br></div>
     {% endfor %}
   </td>
   <td>
     {% for lesson in day  %}
-        <div>
-        {{ lesson.getsubgroup }} <br>
-        </div>
+        <div>{{ lesson.getsubgroup }}<br></div>
     {% endfor %}
   </td>
   <td>
     {% for lesson in day  %}
-        <div>
-        {{ lesson.getsubject }} <br>
-        </div>
+        <div>{{ lesson.getsubject }}<br></div>
     {% endfor %}
   </td>
   <td>
     {% for lesson in day  %}
-        <div>
-        {{ lesson.getlessontype }} <br>
-        </div>
+        <div>{{ lesson.getlessontype }}<br></div>
     {% endfor %}
   </td>
   <td>
     {% for lesson in day  %}
-        <div>
-        {{ lesson.getplace }} <br>
-        </div>
+        <div>{{ lesson.getplace }}<br></div>
     {% endfor %}
   </td>
   <td>
     {% for lesson in day  %}
-        <div>
-        {{ lesson.getlecturer }} <br>
-        </div>
+        <div>{{ lesson.getlecturer }}<br></div>
     {% endfor %}
   </td>
-
 </tr>
 {% endfor %}
 </table>
@@ -78,15 +63,15 @@
     <div class="container">
        <form action="weekschedule" method="get" class="form-inline" style="border:1px solid #DDD;">
         <legend>Получить расписание для конкретной недели</legend>
-    <input name="group" value="{{ group }}">
-    <input  name="subgroup" value="{{ subgroup|default:'' }}"> 
+    <input name="group" value="{{ group }}" type="text">
+    <input  name="subgroup" value="{{ subgroup|default:'' }}" type="text"> 
     {% for weeknumber in weeknumbers  %}
         <label class="radio inline">
         <input type="radio" name="week" id="optionsRadios" value="{{ weeknumber }}">
          {{ weeknumber }}
         </label>
     {% endfor %}
-    <input type="submit" value="На неделю">
+    <input type="submit" value="На неделю" class="btn">
 </form> 
 </div>
 </div>

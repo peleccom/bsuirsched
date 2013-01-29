@@ -24,7 +24,7 @@ def fetch(group):
         else:
             return None
     except Exception, e:
-        logging.info("Fetching group %s error %s" %(str(group),str(e)))
+        logging.error("Fetching group %s error %s" %(str(group), str(e)))
         return None
 
 
@@ -38,13 +38,13 @@ def parse(tablestring, needsubgroup=None, needweek=None):
         try:
             needsubgroup = int(needsubgroup)
         except ValueError, e:
-            logging.debug("Exception in bsuirparser.parse %s" % str(e))
+            logging.error("Exception in bsuirparser.parse %s" % str(e))
             return None
     if needweek:
         try:
             needweek = int(needweek)
         except ValueError, e:
-            logging.debug("Exception in bsuirparser.parse %s" % str(e))
+            logging.error("Exception in bsuirparser.parse %s" % str(e))
             return None
 
     table = table[0]
