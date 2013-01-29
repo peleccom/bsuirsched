@@ -5,14 +5,12 @@
 from lxml import etree
 import models
 import urllib
-import urllib2
 import logging
-
-import os.path
 
 
 def fetch(group):
-    u'''Скачать HTML с расписанием с bsuir'''
+    u'''Скачать HTML с расписанием с bsuir.
+    Возвращает строку с html-разметкой таблицы или None'''
     try:
         parser = etree.HTMLParser(encoding="utf8")
         url = "http://www.bsuir.by/psched/schedulegroup?group=%s" % group
@@ -31,7 +29,7 @@ def fetch(group):
 
 
 def parse(tablestring, needsubgroup=None, needweek=None):
-    '''Распарсить таблицу в объект StudyWeek'''
+    u'''Распарсить таблицу в объект StudyWeek'''
     root = etree.HTML(tablestring)
     table = root.xpath(".//table")
     if not table:
@@ -40,6 +38,7 @@ def parse(tablestring, needsubgroup=None, needweek=None):
         try:
             needsubgroup = int(needsubgroup)
         except ValueError, e:
+            logging.debug("Exception in bsuirparser.parse %s" % str(e))
             return None
     if needweek:
         try:

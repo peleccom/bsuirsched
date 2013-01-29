@@ -51,7 +51,7 @@ def fetchrawtable(group):
         else: # нет в БД
             data = bsuirparser.fetch(group)
             if not data:
-                logging.info("Fetching %s failed" % group)               
+                logging.info("Fetching %s failed" % group)
                 return None
             memcache.set(group, data, MAX_CACHING_TIME)
             logging.info("Get new data for %s and save to cache" % group)
