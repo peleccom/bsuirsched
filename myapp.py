@@ -26,7 +26,6 @@ def fetchrawtable(group):
         logging.debug("Fetching from DB")
         if results:
             schedule = results[0]
-            logging.info("schedule = result[0] + %s"%(datetime.datetime.now() - schedule.date).total_seconds())
             if (datetime.datetime.now() - schedule.date).total_seconds() < MAX_DB_TIME:
                 # в БД
                 memcache.set(group, schedule.text, MAX_CACHING_TIME)
@@ -60,15 +59,20 @@ def fetchrawtable(group):
 
 
 class MainPage(webapp2.RequestHandler):
+    def get(self, additional_path):
+        path = os.path.join(os.path.dirname(__file__),
+                                'templates', 'index.html')
+        self.response.out.write(template.render(path, {}))
+        return
+
+class GroupSchedulePage(webapp2.RequestHandler):
     def get(self):
+
         group = self.request.get("group")
         subgroup = self.request.get("subgroup", None)
         week = self.request.get("week", None)
         if not group: #main page
-            path = os.path.join(os.path.dirname(__file__),
-                                'templates', 'index.html')
-            self.response.out.write(template.render(path, {}))
-            return
+            self.redirect("/")
         else:
             rawtable = fetchrawtable(group)
             if not rawtable:
@@ -92,4 +96,9 @@ class MainPage(webapp2.RequestHandler):
                 self.response.out.write(u"Что-то пошло не так")
                 logging.debug(u"Ошибка при разборе расписания")
 
-app = webapp2.WSGIApplication([('/', MainPage)])
+
+app = webapp2.WSGIApplication([
+                                ('/(home)?', MainPage),
+                                ('/weekschedule',GroupSchedulePage)
+
+                                ])
