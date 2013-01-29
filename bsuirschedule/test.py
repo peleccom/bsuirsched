@@ -4,6 +4,7 @@
 
 import unittest
 import models
+import bsuirparser
 
 class TestGlobalFunctions(unittest.TestCase):
 
@@ -26,13 +27,13 @@ class TestGlobalFunctions(unittest.TestCase):
     def testLesson(self):
         les1 = models.Lesson((1,2),"", None, u"Жож",
                            "lec", "412-3", u"Калашников")
-        les2 = models.Lesson((1,2),"", 2, u"Жож",
+        models.Lesson((1,2),"", 2, u"Жож",
                            "lec", "412-3",u"Калашников")
         with self.assertRaises(ValueError):
-            les1 = models.Lesson((1,"a"),"", 2, u"Жож",
+            models.Lesson((1,"a"),"", 2, u"Жож",
                            "lec", "412-3", u"Калашников")
         with self.assertRaises(ValueError):
-            les1 = models.Lesson((1,2),"", "a", u"Жож",
+            models.Lesson((1,2),"", "a", u"Жож",
                            "lec", "412-3", u"Калашников")
     def testLessonStr(self):
         les1 = models.Lesson((1,2),"", None, u"Жож",
@@ -43,6 +44,110 @@ class TestGlobalFunctions(unittest.TestCase):
         les1 = models.Lesson("1,3,4","", None, u"Жож",
                            "lec", "412-3", u"Калашников")
         self.assertEqual(unicode(les1), u"1,3,4    Жож lec 412-3 Калашников" )
+
+    def testParse(self):
+       testdata = u'''<table class="default schedule"><tbody><tr><th></th><th>Недели</th><th>Время</th>
+       <th>Подгр.</th><th>Предмет</th><th>Тип</th><th>Аудит.</th><th>Преподаватель</th></tr><tr><td>пн</td><td>
+       <div><br></div><div><br></div><div>2<br></div><div>1<br></div><div>4<br></div><div>3<br></div><div>3<br></div><div>
+       4<br></div><div>2<br></div></td><td><div>8:00-9:35<br></div><div>9:45-11:20<br></div><div>11:40-13:15<br></div>
+       <div>11:40-13:15<br></div><div>11:40-13:15<br></div><div>11:40-13:15<br></div><div>13:25-15:00<br></div>
+       <div>13:25-15:00<br></div><div>13:25-15:00<br></div></td><td><div><br></div><div><br></div><div>1<br></div><div>2<br>
+       </div><div><br></div><div><br></div><div><br></div><div><br></div><div>1<br></div></td><td><div>МССвИР<br></div>
+       <div>СхТ<br></div><div>ТПР<br></div><div>ТПР<br></div><div>ОТУиС<br></div><div>СхТ<br></div><div>ТПР<br></div>
+       <div>СхТ<br></div><div>СхТ<br></div></td><td><div>лк<br></div><div>лк<br></div><div>лр<br></div><div>лр<br></div>
+       <div>лр<br></div><div>лр<br></div><div>лр<br></div><div>лр<br></div><div>лр<br></div></td><td><div>205-3<br></div>
+       <div>205-3<br></div><div>505-5<br></div><div>505-5<br></div><div>221-5<br></div><div>506-5<br></div><div>505-5<br>
+       </div><div>506-5<br></div><div>506-5<br></div></td><td><div>Гусынина Ю.А.<br></div><div>Тимошенко В.С.<br></div>
+       <div>Искра Н.А.<br></div><div>Искра Н.А.<br></div><div>Сидорович А.С.<br></div><div>Тимошенко В.С.<br></div>
+       <div>Искра Н.А.<br></div><div>Тимошенко В.С.<br></div><div>Тимошенко В.С.<br></div></td></tr><tr><td>вт</td><td><div>1,3<br>
+       </div><div>4<br></div><div>1,3<br></div><div>2,4<br></div><div>2,4<br></div><div>1,3<br></div><div><br></div><div><br>
+       </div></td><td><div>11:40-13:15<br></div><div>11:40-13:15<br></div><div>11:40-13:15<br></div><div>11:40-13:15<br></div>
+       <div>13:25-15:00<br></div><div>13:25-15:00<br></div><div>15:20-16:55<br></div><div>17:05-18:40<br></div></td><td><div>1<br></div>
+       <div>1<br></div><div>2<br></div><div>2<br></div><div><br></div><div><br></div><div><br></div><div><br></div></td><td><div>ООПП<br>
+       </div><div>СхТ<br></div><div>СхТ<br></div><div>ООПП<br></div><div>АВМиС<br></div><div>ООПП<br></div><div>АВМиС<br></div><div>СПОВМ<br>
+       </div></td><td><div>лр<br></div><div>лр<br></div><div>лр<br></div><div>лр<br></div><div>лр<br></div><div>лр<br></div><div>лк<br></div>
+       <div>лк<br></div></td><td><div>505-5<br></div><div>506-5<br></div><div>506-5<br></div><div>505-5<br></div><div>502-5<br></div>
+       <div>505-5<br></div><div>514-5<br></div><div>514-5<br></div></td><td><div>Искра Н.А.<br></div><div>Тимошенко В.С.<br></div>
+       <div>Тимошенко В.С.<br></div><div>Искра Н.А.<br></div><div>Одинец Д.Н.<br></div><div>Искра Н.А.<br></div><div>Одинец Д.Н.<br>
+       </div><div>Фролов И.И.<br></div></td></tr><tr><td>ср</td><td><div><br></div><div>1,3<br></div><div>2,4<br></div><div><br></div>
+       <div>1,3<br></div><div>2,4<br></div><div>1,3<br></div><div>2,4<br></div></td><td><div>8:00-9:35<br></div><div>9:45-11:20<br></div>
+       <div>9:45-11:20<br></div><div>11:40-13:15<br></div><div>13:25-15:00<br></div><div>13:25-15:00<br></div><div>13:25-15:00<br></div>
+       <div>13:25-15:00<br></div></td><td><div><br></div><div><br></div><div><br></div><div><br></div><div>1<br></div><div>1<br></div><div>2<br>
+       </div><div>2<br></div></td><td><div>ООПП<br></div><div>СхТ<br></div><div>СПОВМ<br></div><div>ФК-ЗОЖ СПИДиН<br></div><div>АВМиС<br>
+       </div><div>СПОВМ<br></div><div>СПОВМ<br></div><div>АВМиС<br></div></td><td><div>лк<br></div><div>лк<br></div><div>лк<br></div><div>
+       <br></div><div>лр<br></div><div>лр<br></div><div>лр<br></div><div>лр<br></div></td><td><div>514-5<br></div><div>514-5<br></div>
+       <div>514-5<br></div><div><br></div><div>502-5<br></div><div>509-5<br></div><div>509-5<br></div><div>502-5<br></div></td><td>
+       <div>Супонев В.А.<br></div><div>Тимошенко В.С.<br></div><div>Фролов И.И.<br></div><div><br></div><div>Одинец Д.Н.<br></div>
+       <div>Перцев Д.Ю.<br></div><div>Перцев Д.Ю.<br></div><div>Одинец Д.Н.<br></div></td></tr><tr><td>чт</td><td><div><br></div>
+       </td><td><div><br></div></td><td><div><br></div></td><td><div>Спецподготовка<br></div></td><td><div><br></div></td><td><div>
+       <br></div></td><td><div><br></div></td></tr><tr><td>пт</td><td><div><br></div><div><br></div><div>2,4<br></div></td><td>
+       <div>8:00-9:35<br></div><div>9:45-11:20<br></div><div>11:40-13:15<br></div></td><td><div><br></div><div><br></div><div><br></div>
+       </td><td><div>ОТУиС<br></div><div>ФК-ЗОЖ СПИДиН<br></div><div>СхТ<br></div></td><td><div>лк<br></div><div><br></div><div>пз<br></div>
+       </td><td><div>514-5<br></div><div><br></div><div>506-5<br></div></td><td><div>Иванов Н.Н.<br></div><div><br></div><div><br></div>
+       </td></tr><tr><td>сб</td><td><div>4<br></div><div>1<br></div><div>3<br></div><div>2<br></div><div>1<br></div><div>3<br></div>
+       <div>2,4<br></div><div>2,4<br></div><div>1,3<br></div><div>1,3<br></div><div>2,4<br></div></td><td><div>8:00-9:35<br>
+       </div><div>8:00-9:35<br></div><div>8:00-9:35<br></div><div>8:00-9:35<br></div><div>9:45-11:20<br></div><div>9:45-11:20<br>
+       </div><div>9:45-11:20<br></div><div>11:40-13:15<br></div><div>11:40-13:15<br></div><div>13:25-15:00<br>
+       </div><div>13:25-15:00<br></div></td><td><div>2<br></div><div>1<br></div><div>2<br></div><div>1<br></div>
+       <div><br></div><div><br></div><div><br></div><div><br></div><div><br></div><div><br></div><div><br></div>
+       </td><td><div>ОТУиС<br></div><div>МССвИР<br></div><div>МССвИР<br></div><div>ОТУиС<br></div><div>МССвИР<br>
+       </div><div>МССвИР<br></div><div>СПОВМ<br></div><div>ОТУиС<br></div><div>ТПР<br></div><div>АВМиС<br></div>
+       <div>ООПП<br></div></td><td><div>лр<br></div><div>лр<br></div><div>лр<br></div><div>лр<br></div><div>лр<br>
+       </div><div>пз<br></div><div>лр<br></div><div>лк<br></div><div>лк<br></div><div>лк<br></div><div>лк<br></div>
+       </td><td><div>501-5<br></div><div>305-3, 303-3<br></div><div>305-3, 303-3<br></div><div>501-5<br></div>
+       <div>305-3<br></div><div>305-3<br></div><div>505-5<br></div><div>514-5<br></div><div>514-5<br></div><div>514-5<br>
+       </div><div>514-5<br></div></td><td><div>Сидорович А.С.<br></div><div>Гусынина Ю.А.<br></div><div>Гусынина Ю.А.<br>
+       </div><div>Сидорович А.С.<br></div><div>Гусынина Ю.А.<br></div><div>Гусынина Ю.А.<br></div><div>Перцев Д.Ю.<br>
+       </div><div>Иванов Н.Н.<br></div><div>Татур М.М.<br></div><div>Одинец Д.Н.<br></div><div>Супонев В.А.<br></div>
+       </td></tr></tbody></table>'''
+       testresult = u'''8:00-9:35  МССвИР лк 205-3 Гусынина Ю.А.
+9:45-11:20  СхТ лк 205-3 Тимошенко В.С.
+2  11:40-13:15 1 ТПР лр 505-5 Искра Н.А.
+1  11:40-13:15 2 ТПР лр 505-5 Искра Н.А.
+4  11:40-13:15  ОТУиС лр 221-5 Сидорович А.С.
+3  11:40-13:15  СхТ лр 506-5 Тимошенко В.С.
+3  13:25-15:00  ТПР лр 505-5 Искра Н.А.
+4  13:25-15:00  СхТ лр 506-5 Тимошенко В.С.
+2  13:25-15:00 1 СхТ лр 506-5 Тимошенко В.С.
+1,3  11:40-13:15 1 ООПП лр 505-5 Искра Н.А.
+4  11:40-13:15 1 СхТ лр 506-5 Тимошенко В.С.
+1,3  11:40-13:15 2 СхТ лр 506-5 Тимошенко В.С.
+2,4  11:40-13:15 2 ООПП лр 505-5 Искра Н.А.
+2,4  13:25-15:00  АВМиС лр 502-5 Одинец Д.Н.
+1,3  13:25-15:00  ООПП лр 505-5 Искра Н.А.
+15:20-16:55  АВМиС лк 514-5 Одинец Д.Н.
+17:05-18:40  СПОВМ лк 514-5 Фролов И.И.
+8:00-9:35  ООПП лк 514-5 Супонев В.А.
+1,3  9:45-11:20  СхТ лк 514-5 Тимошенко В.С.
+2,4  9:45-11:20  СПОВМ лк 514-5 Фролов И.И.
+11:40-13:15  ФК-ЗОЖ СПИДиН
+1,3  13:25-15:00 1 АВМиС лр 502-5 Одинец Д.Н.
+2,4  13:25-15:00 1 СПОВМ лр 509-5 Перцев Д.Ю.
+1,3  13:25-15:00 2 СПОВМ лр 509-5 Перцев Д.Ю.
+2,4  13:25-15:00 2 АВМиС лр 502-5 Одинец Д.Н.
+Спецподготовка
+8:00-9:35  ОТУиС лк 514-5 Иванов Н.Н.
+9:45-11:20  ФК-ЗОЖ СПИДиН
+2,4  11:40-13:15  СхТ пз 506-5
+4  8:00-9:35 2 ОТУиС лр 501-5 Сидорович А.С.
+1  8:00-9:35 1 МССвИР лр 305-3, 303-3 Гусынина Ю.А.
+3  8:00-9:35 2 МССвИР лр 305-3, 303-3 Гусынина Ю.А.
+2  8:00-9:35 1 ОТУиС лр 501-5 Сидорович А.С.
+1  9:45-11:20  МССвИР лр 305-3 Гусынина Ю.А.
+3  9:45-11:20  МССвИР пз 305-3 Гусынина Ю.А.
+2,4  9:45-11:20  СПОВМ лр 505-5 Перцев Д.Ю.
+2,4  11:40-13:15  ОТУиС лк 514-5 Иванов Н.Н.
+1,3  11:40-13:15  ТПР лк 514-5 Татур М.М.
+1,3  13:25-15:00  АВМиС лк 514-5 Одинец Д.Н.
+2,4  13:25-15:00  ООПП лк 514-5 Супонев В.А.'''
+       studyweek = bsuirparser.parse(testdata)
+       text =u''
+       for studyday in studyweek:
+            for lesson in studyday:
+                text += unicode(lesson).strip()+"\n"
+       self.assertEqual(text.strip(), testresult.strip())
+
+
 
 if __name__ == '__main__':
     unittest.main()
