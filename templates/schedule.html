@@ -3,24 +3,28 @@
   Расписание группы {{ group }}
 {% endblock title %}
 {% block content %}
-<p class="well pagination-centered">
-    Расписание группы <span class="text-info"> {{group}} </span> 
-{% if subgroup != "0" %}
-<br>
-Подгруппа {{ subgroup }}
-{% endif %}
-{% if selweek != "0" and selweek%}
-<br>
-Неделя {{ selweek }}  
-{% endif %}
-</p>
 <table class="table table-bordered table-condensed table-striped table-hover">
+<caption>
+  <div class="well">
+      Расписание группы <span class="text-info"> {{group}} </span> 
+  {% if subgroup != "0" %}
+  <br>
+  Подгруппа <span class="text-info">{{ subgroup }}</span>
+  {% endif %}
+  {% if selweek != "0" and selweek%}
+  <br>
+  Неделя <span class="text-info">{{ selweek }}  </span>
+  {% endif %}
+  </div>
+  <br>
+</capton>
 {% for day in week %}
 {% if forloop.first %}
 <thead>
 <tr><th></th><th>Недели</th><th>Время</th><th>Подгр.</th><th>Предмет</th><th>Тип</th><th>Аудит.</th><th>Преподаватель</th></tr>
 </thead>
 {% endif %}
+<tbody>
 <tr>
   <td>{{ day.getname }}</td>
   <td>
@@ -60,20 +64,24 @@
   </td>
 </tr>
 {% endfor %}
+</tbody>
 </table>
 <br>
 
 <form action="weekschedule" method="get" class="form-inline" style="border:1px solid #DDD;">
+  <fieldset>
     <legend>Получить расписание для конкретной недели</legend>
-    <input name="group" value="{{ group }}" type="text">
-    <input  name="subgroup" value="{{ subgroup|default:'' }}" type="text"> 
+    <input name="group" value="{{ group }}" type="text" title="Группа">
+
+    <input  name="subgroup" value="{{ subgroup|default:'' }}" type="text" title="Подгруппа"> 
     {% for weeknumber in weeknumbers  %}
-        <label class="radio inline">
-        <input type="radio" name="week" id="optionsRadios {{ weeknumber }}" value="{{ weeknumber }}">
+        <label class="radio inline" title="Неделя">
+        <input type="radio" name="week" id="optionsRadios{{ weeknumber }}" value="{{ weeknumber }}">
          {{ weeknumber }}
         </label>
     {% endfor %}
-    <input type="submit" value="На неделю" class="btn">
+    <button type="submit" class="btn">Получить расписание</button>
+  </fieldset>
 </form> 
 
 {% endblock content %}
