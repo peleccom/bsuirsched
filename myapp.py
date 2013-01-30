@@ -21,7 +21,7 @@ def fetchrawtable(group):
     else:
         # Нет в кэше
         q = GroupSchedule.all()
-        q.filter("group = ", str(group))
+        q.filter("group = ", group)
         results = q.fetch(1)
         if results:
             schedule = results[0]

@@ -24,7 +24,7 @@ def fetch(group):
         else:
             return None
     except Exception, e:
-        logging.error("Fetching group %s error %s" %(str(group), str(e)))
+        logging.error("Fetching error %s" %(str(e)))
         return None
 
 
