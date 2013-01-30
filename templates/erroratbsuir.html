@@ -3,21 +3,23 @@
   Ошибка
 {% endblock title %}
 {% block content %}
-<div class="offset2">
+<div class="pagination-centered">
     <h1>
-  {# <p class="text-warning"> #}
+  <p class="text-error"> 
     Не удалось получить расписание.
-{# </p> #}
+</p> 
     </h1>
 </div>
-<div class="offset2">
+<div class="pagination-centered">
     <h2>Возможно, что-то не так с самим сайтом bsuir.by</h2>
 </div>
 <br>
 <hr>
-<div class="offset2">
+<div class="pagination-centered">
     <h3>
-    Можно попробовать посмотреть расписание напрямую по <a href="http://www.bsuir.by/psched/schedulegroup?group={{ group|urlencode }}">этой ссылке</a>
+    <p class="text-warning">
+        Можно попробовать посмотреть расписание напрямую по <a href="http://www.bsuir.by/psched/schedulegroup?group={{ group|urlencode }}">этой ссылке</a>
+    </p>
     </h3>
 </div>
 

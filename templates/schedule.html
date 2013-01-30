@@ -3,8 +3,8 @@
   Расписание группы {{ group }}
 {% endblock title %}
 {% block content %}
-<p class="well" style="text-align: center;">
-    Расписание группы <em> {{group}} </em>
+<p class="well pagination-centered">
+    Расписание группы <span class="text-info"> {{group}} </span> 
 {% if subgroup != "0" %}
 <br>
 Подгруппа {{ subgroup }}
@@ -69,7 +69,7 @@
     <input  name="subgroup" value="{{ subgroup|default:'' }}" type="text"> 
     {% for weeknumber in weeknumbers  %}
         <label class="radio inline">
-        <input type="radio" name="week" id="optionsRadios" value="{{ weeknumber }}">
+        <input type="radio" name="week" id="optionsRadios {{ weeknumber }}" value="{{ weeknumber }}">
          {{ weeknumber }}
         </label>
     {% endfor %}
