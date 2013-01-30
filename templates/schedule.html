@@ -1,4 +1,7 @@
 {% extends "base.html" %}
+{% block title %}
+  Расписание группы {{ group }}
+{% endblock title %}
 {% block content %}
 <p class="well" style="text-align: center;">
     Расписание группы <em> {{group}} </em>
@@ -59,10 +62,9 @@
 {% endfor %}
 </table>
 <br>
-<div class="row">
-    <div class="container">
-       <form action="weekschedule" method="get" class="form-inline" style="border:1px solid #DDD;">
-        <legend>Получить расписание для конкретной недели</legend>
+
+<form action="weekschedule" method="get" class="form-inline" style="border:1px solid #DDD;">
+    <legend>Получить расписание для конкретной недели</legend>
     <input name="group" value="{{ group }}" type="text">
     <input  name="subgroup" value="{{ subgroup|default:'' }}" type="text"> 
     {% for weeknumber in weeknumbers  %}
@@ -73,7 +75,5 @@
     {% endfor %}
     <input type="submit" value="На неделю" class="btn">
 </form> 
-</div>
-</div>
 
 {% endblock content %}

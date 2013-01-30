@@ -11,6 +11,48 @@
 <meta property="og:image" content="/static/img/student.jpeg"/>
     <!-- Bootstrap -->
     <link href="static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+        <style type="text/css">
+
+      /* Sticky footer styles
+      -------------------------------------------------- */
+
+      html,
+      body {
+        height: 100%;
+        /* The html and body elements cannot have any padding or margin. */
+      }
+
+      /* Wrapper for page content to push down footer */
+      #wrap {
+        min-height: 100%;
+        height: auto !important;
+        height: 100%;
+        /* Negative indent footer by it's height */
+        margin: 0 auto -60px;
+      }
+
+      /* Set the fixed height of the footer here */
+      #push,
+      #footer {
+        height: 60px;
+      }
+      #footer {
+        background-color: #f5f5f5;
+      }
+
+      /* Lastly, apply responsive CSS fixes as necessary */
+      @media (max-width: 767px) {
+        #footer {
+          margin-left: -20px;
+          margin-right: -20px;
+          padding-left: 20px;
+          padding-right: 20px;
+        }
+      }
+
+    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="static/bootstrap/css/bootstrap-responsive.css">
     <!--Google analytics -->
     <script type="text/javascript">
 
@@ -27,24 +69,34 @@
 </script>
 </head>
 <body>
-<ul class="nav nav-tabs">
-  <li><a href="/home">Домой</a></li>
-</ul>
-<div>
-<a href="https://github.com/peleccom/bsuirsched"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png" alt="Fork me on GitHub"></a></div>
-    {% block content %}
-        ggg
-    {% endblock content %}
+<div id="wrap">
+    <div class="container">
+    <ul class="nav nav-tabs">
+        <li><a href="/home">Домой</a></li>
+    </ul>
+
+    <div>
+    <a href="https://github.com/peleccom/bsuirsched"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png" alt="Fork me on GitHub"></a></div>
+        {% block content %}
+
+        {% endblock content %}
+
+    </div>
+<div id="push"></div>
+</div>
     {% block footer %}
-    <footer class="footer">
-            <p class="well pull-left" >
+    <div id="footer">
+        <div class="container">
+            <p class="muted credit span4 offset4" >
                 <a href="mailto:peleccom@mail.ru">Питкин Александр</a>, 2013
                 <br>
                 <img src="https://developers.google.com/appengine/images/appengine-silver-120x30.gif" 
-alt="Powered by Google App Engine" />   
+            alt="Powered by Google App Engine" />   
             </p>
-    </footer>     
+        </div>
+    </div>   
     {% endblock footer %}
+    </div>
     <!-- Boostrap scripts -->
     <script type="text/javascript" src="static/bootstrap/js/jquery-1.8.0.min.js"></script>
     <script src="static/bootstrap/js/bootstrap.min.js"></script>
