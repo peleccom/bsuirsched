@@ -3,15 +3,20 @@
   Расписание группы {{ group }}
 {% endblock title %}
 {% block content %}
+<div class="pull-right btn-toolbar">
+  
+<button class="btn {% if not default_group %}hide{% endif %}" id="DeleteDefaultButton" title="Начинать с главной страницы" onclick="DeleteDefaultGroup();"><i class="icon-trash"></i> Это не моя группа</button>
+<button class="btn btn-primary {% if default_group %}hide{% endif %}" id="SetDefaultButton" title="Запомнить группу" onclick="SetDefaultGroup('{{ group }}');"><i class="icon-star"></i> Это моя группа</button>
+</div>
 <table class="table table-bordered table-condensed table-striped table-hover">
 <caption>
   <div class="well">
       Расписание группы <span class="text-info"> {{group}} </span> 
-  {% if subgroup != "0" %}
+  {% if subgroup != "0" and subgroup %}
   <br>
   Подгруппа <span class="text-info">{{ subgroup }}</span>
   {% endif %}
-  {% if selweek != "0" and selweek%}
+  {% if selweek != "0" and selweek %}
   <br>
   Неделя <span class="text-info">{{ selweek }}  </span>
   {% endif %}

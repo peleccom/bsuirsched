@@ -8,6 +8,7 @@ from google.appengine.api import memcache
 from bsuirschedule import bsuirparser
 from models import GroupSchedule
 import datetime
+import urllib
 
 
 MAX_CACHING_TIME = 24 * 60 * 60
@@ -57,12 +58,37 @@ def fetchrawtable(group):
             return data
 
 
+def hasdefaultgroup(request):
+    '''Return stored default group info'''
+    if not request.cookies.has_key("default_group"):
+        return None
+    groupdic = {}
+    groupdic["group"] = request.cookies.get("default_group")
+    subgroup = request.cookies.get("default_subgroup", None)
+    if subgroup:
+        groupdic["subgroup"] = subgroup
+    return groupdic
 
 class MainPage(webapp2.RequestHandler):
     def get(self, additional_path):
+        #Проверить куку и если установлена оправить напрямую
+        if not additional_path:
+            default_group_dic = hasdefaultgroup(self.request)
+            if default_group_dic:
+                try:
+                    query_str = urllib.urlencode(default_group_dic)
+                    self.redirect("/weekschedule?"+query_str)
+                except Exception, e:
+                    logging.error("Redirecting error : %s" % e)
+                    self.redirect("/home")
+
         path = os.path.join(os.path.dirname(__file__),
                                 'templates', 'index.html')
-        self.response.out.write(template.render(path, {}))
+        self.response.out.write(template.render(path,
+                {
+                "default_group": hasdefaultgroup(self.request)
+                }
+                ))
         return
 
 class GroupSchedulePage(webapp2.RequestHandler):
@@ -79,7 +105,9 @@ class GroupSchedulePage(webapp2.RequestHandler):
                 path = os.path.join(os.path.dirname(__file__),
                                     'templates', 'erroratbsuir.html')
                 self.response.out.write(template.render(path,
-                                        {'group': group}))
+                                        {'group': group,
+                                        "default_group": hasdefaultgroup(self.request)
+                                        }))
                 return
             parsed = bsuirparser.parse(rawtable, subgroup, week)
             if parsed:
@@ -88,7 +116,9 @@ class GroupSchedulePage(webapp2.RequestHandler):
                 self.response.out.write(template.render(path, {"week": parsed,
                                         "group": group, "subgroup": subgroup,
                                         "selweek": week,
-                                        "weeknumbers": range(1, 5)})
+                                        "weeknumbers": range(1, 5),
+                                        "default_group": hasdefaultgroup(self.request)
+                                        })
                                         )
             else:
                 self.response.headers['Content-Type'] = 'text/plain'
