@@ -147,6 +147,11 @@ class TestGlobalFunctions(unittest.TestCase):
                 text += unicode(lesson).strip()+"\n"
        self.assertEqual(text.strip(), testresult.strip())
 
+    def testWeekNmber(self):
+        self.assertEqual(1, models.StudyWeek.getweeknum(2012,9,1))
+        self.assertEqual(2, models.StudyWeek.getweeknum(2012,9,3))
+        self.assertEqual(4, models.StudyWeek.getweeknum(2013,2,9))
+        self.assertEqual(None, models.StudyWeek.getweeknum(2013,40,40))
 
 
 if __name__ == '__main__':

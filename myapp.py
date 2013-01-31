@@ -91,6 +91,11 @@ class MainPage(webapp2.RequestHandler):
                 ))
         return
 
+class DaySchedulePage(webapp2.RequestHandler):
+    def get(self):
+        return self.response.out.write("sddd")
+        pass
+
 class GroupSchedulePage(webapp2.RequestHandler):
     def get(self):
 
@@ -128,6 +133,7 @@ class GroupSchedulePage(webapp2.RequestHandler):
 
 app = webapp2.WSGIApplication([
                                 ('/(home)?', MainPage),
-                                ('/weekschedule',GroupSchedulePage)
+                                ('/weekschedule',GroupSchedulePage),
+                                ('/dayschedule',DaySchedulePage)
 
                                 ])

@@ -203,10 +203,14 @@ class StudyWeek(object):
     @staticmethod
     def getweeknum(year, month, day):
         '''Return week number'''
-        startday = datetime.date(2012, 9, 1)
-        newweek = datetime.date(year, month, day).isocalendar()[1]
-        startweek = startday.isocalendar()[1]
-        return ((newweek - startweek) % 4) +1
-
-
+        try:
+            if month >= 9:
+                startday = datetime.date(year, 9, 1)
+            else:
+                startday = datetime.date(year-1, 9, 1)
+            newweek = datetime.date(year, month, day).isocalendar()[1]
+            startweek = startday.isocalendar()[1]
+            return ((newweek - startweek) % 4) +1
+        except Exception:
+            return None
 
