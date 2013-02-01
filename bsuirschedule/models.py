@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-import datetime
-
 class Lecturer(object):
     def __init__(self, name):
         self.name = name
@@ -178,6 +176,19 @@ class StudyDay(object):
     def getname(self):
         return self._name
 
+    def getFullName(self):
+        weekday_names = {
+        u"пн": u"Понедельник",
+        u"вт":u"Вторник",
+        u"ср":u"Среда",
+        u"чт":u"Четверг",
+        u"пт":u"Пятница",
+        u"сб":u"Суббота",
+        u"вс":u"Воскресенье"
+        }
+
+        return weekday_names.get(self.getname(),None)
+
 
 class StudyWeek(object):
     def __init__(self, studydays):
@@ -194,23 +205,15 @@ class StudyWeek(object):
             days.append(day.filter(subgroup, week))
         return StudyWeek(days)
 
+    def getDay(self, day):
+        '''Return Studyday with number'''
+        if day>5:
+            return None
+        return self.studydays[day]
+
     def __unicode__(self):
         s = u""
         for day in self:
             s += unicode(day) + "\n"
         return s
-    
-    @staticmethod
-    def getweeknum(year, month, day):
-        '''Return week number'''
-        try:
-            if month >= 9:
-                startday = datetime.date(year, 9, 1)
-            else:
-                startday = datetime.date(year-1, 9, 1)
-            newweek = datetime.date(year, month, day).isocalendar()[1]
-            startweek = startday.isocalendar()[1]
-            return ((newweek - startweek) % 4) +1
-        except Exception:
-            return None
 

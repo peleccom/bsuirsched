@@ -9,6 +9,7 @@ from bsuirschedule import bsuirparser
 from models import GroupSchedule
 import datetime
 import urllib
+import time
 
 
 MAX_CACHING_TIME = 24 * 60 * 60
@@ -92,6 +93,41 @@ class MainPage(webapp2.RequestHandler):
         return
 
 class DaySchedulePage(webapp2.RequestHandler):
+
+    def getajaxcontext(self):
+        group = self.request.get("group",None)
+        subgroup = self.request.get("subgroup",None)
+        date_str=self.request.get("date",None)
+        try:
+            date = datetime.datetime.strptime(date_str, "%d-%m-%Y")
+        except Exception:
+            # Wrong date
+            pass
+            return
+        if not group:
+            return
+        else:
+            rawtable = fetchrawtable(group)
+            if not rawtable:
+                return
+                #error bsuir
+        weeknum = bsuirparser.getweeknum(date.year, date.month, date.day)
+        if not weeknum:
+            return
+            #incorrectdate
+        parsed = bsuirparser.parse(rawtable,subgroup,weeknum)
+        if parsed:
+            studyday = parsed.getDay(date.weekday())
+            return {
+                "default_group": hasdefaultgroup(self.request),
+                "studyday":studyday,
+                "target_date": date,
+                "weeknum": weeknum,
+                "group": group,
+                "subgroup": subgroup
+                }
+
+
     def get(self):
         path = os.path.join(os.path.dirname(__file__),
                                 'templates', 'dayschedule.html')
@@ -100,6 +136,17 @@ class DaySchedulePage(webapp2.RequestHandler):
                 "default_group": hasdefaultgroup(self.request)
                 }
                 ))
+    def post(self):
+        context = self.getajaxcontext()
+        if context:
+            path = os.path.join(os.path.dirname(__file__),
+                               'templates', 'dayscheduleajax.html')
+            self.response.out.write(template.render(path,
+                context
+                ))
+        else:
+            return
+
 
 class GroupSchedulePage(webapp2.RequestHandler):
     def get(self):

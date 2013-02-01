@@ -57,19 +57,6 @@
     </style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="static/bootstrap/css/bootstrap-responsive.css">
-    <!--Google analytics -->
-    <script type="text/javascript">
-    var _gaq = _gaq || [];
-    _gaq.push(['_setAccount', 'UA-34673267-1']);
-    _gaq.push(['_trackPageview']);
-
-  (function() {
-    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-  })();
-
-</script>
 </head>
 <body>
 <div id="wrap">
@@ -79,6 +66,7 @@
             <a class="brand" href="#">Расписание</a>
             <ul class="nav nav-tabs">
                 <li><a href="/home"><i class="icon-home icon-white"></i> На главную</a></li>
+                <li><a href="/dayschedule"><i class="icon-time icon-white"></i> Расписание на день</a></li>
                 {% if default_group %}
                 <li><a href="/"><i class="icon-user icon-white"></i> Группа {{ default_group.group }}</a></li>
                 {% endif %}
@@ -114,5 +102,18 @@
     {% block AdditionalJS %}
         
     {% endblock AdditionalJS %}
+        <!--Google analytics -->
+    <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-34673267-1']);
+    _gaq.push(['_trackPageview']);
+
+  (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+  })();
+
+</script>
 </body>
 </html>

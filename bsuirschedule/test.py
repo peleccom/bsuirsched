@@ -9,44 +9,7 @@ import bsuirparser
 class TestGlobalFunctions(unittest.TestCase):
 
     def setUp(self):
-        pass
-
-    def tearDown(self):
-        pass
-
-    def testStudyWeek(self):
-        les = models.Lesson((1,2),"", None,u"Жож",
-                           "lec", "412-3", u"Калашников"
-                            )
-        day = models.StudyDay([les, les], u"Суббота")
-        week = models.StudyWeek([day])
-        for day in week:
-            for lesson in day:
-                self.assertEqual(lesson, les)
-
-    def testLesson(self):
-        les1 = models.Lesson((1,2),"", None, u"Жож",
-                           "lec", "412-3", u"Калашников")
-        models.Lesson((1,2),"", 2, u"Жож",
-                           "lec", "412-3",u"Калашников")
-        with self.assertRaises(ValueError):
-            models.Lesson((1,"a"),"", 2, u"Жож",
-                           "lec", "412-3", u"Калашников")
-        with self.assertRaises(ValueError):
-            models.Lesson((1,2),"", "a", u"Жож",
-                           "lec", "412-3", u"Калашников")
-    def testLessonStr(self):
-        les1 = models.Lesson((1,2),"", None, u"Жож",
-                           "lec", "412-3", u"Калашников")
-        self.assertEqual(unicode(les1), u"1,2    Жож lec 412-3 Калашников")
-
-    def testLessonWeekStr(self):
-        les1 = models.Lesson("1,3,4","", None, u"Жож",
-                           "lec", "412-3", u"Калашников")
-        self.assertEqual(unicode(les1), u"1,3,4    Жож lec 412-3 Калашников" )
-
-    def testParse(self):
-       testdata = u'''<table class="default schedule"><tbody><tr><th></th><th>Недели</th><th>Время</th>
+        self.testdata = u'''<table class="default schedule"><tbody><tr><th></th><th>Недели</th><th>Время</th>
        <th>Подгр.</th><th>Предмет</th><th>Тип</th><th>Аудит.</th><th>Преподаватель</th></tr><tr><td>пн</td><td>
        <div><br></div><div><br></div><div>2<br></div><div>1<br></div><div>4<br></div><div>3<br></div><div>3<br></div><div>
        4<br></div><div>2<br></div></td><td><div>8:00-9:35<br></div><div>9:45-11:20<br></div><div>11:40-13:15<br></div>
@@ -100,6 +63,43 @@ class TestGlobalFunctions(unittest.TestCase):
        </div><div>Сидорович А.С.<br></div><div>Гусынина Ю.А.<br></div><div>Гусынина Ю.А.<br></div><div>Перцев Д.Ю.<br>
        </div><div>Иванов Н.Н.<br></div><div>Татур М.М.<br></div><div>Одинец Д.Н.<br></div><div>Супонев В.А.<br></div>
        </td></tr></tbody></table>'''
+        pass
+
+    def tearDown(self):
+        pass
+
+    def testStudyWeek(self):
+        les = models.Lesson((1,2),"", None,u"Жож",
+                           "lec", "412-3", u"Калашников"
+                            )
+        day = models.StudyDay([les, les], u"Суббота")
+        week = models.StudyWeek([day])
+        for day in week:
+            for lesson in day:
+                self.assertEqual(lesson, les)
+
+    def testLesson(self):
+        les1 = models.Lesson((1,2),"", None, u"Жож",
+                           "lec", "412-3", u"Калашников")
+        models.Lesson((1,2),"", 2, u"Жож",
+                           "lec", "412-3",u"Калашников")
+        with self.assertRaises(ValueError):
+            models.Lesson((1,"a"),"", 2, u"Жож",
+                           "lec", "412-3", u"Калашников")
+        with self.assertRaises(ValueError):
+            models.Lesson((1,2),"", "a", u"Жож",
+                           "lec", "412-3", u"Калашников")
+    def testLessonStr(self):
+        les1 = models.Lesson((1,2),"", None, u"Жож",
+                           "lec", "412-3", u"Калашников")
+        self.assertEqual(unicode(les1), u"1,2    Жож lec 412-3 Калашников")
+
+    def testLessonWeekStr(self):
+        les1 = models.Lesson("1,3,4","", None, u"Жож",
+                           "lec", "412-3", u"Калашников")
+        self.assertEqual(unicode(les1), u"1,3,4    Жож lec 412-3 Калашников" )
+
+    def testParse(self):
        testresult = u'''8:00-9:35  МССвИР лк 205-3 Гусынина Ю.А.
 9:45-11:20  СхТ лк 205-3 Тимошенко В.С.
 2  11:40-13:15 1 ТПР лр 505-5 Искра Н.А.
@@ -140,7 +140,7 @@ class TestGlobalFunctions(unittest.TestCase):
 1,3  11:40-13:15  ТПР лк 514-5 Татур М.М.
 1,3  13:25-15:00  АВМиС лк 514-5 Одинец Д.Н.
 2,4  13:25-15:00  ООПП лк 514-5 Супонев В.А.'''
-       studyweek = bsuirparser.parse(testdata)
+       studyweek = bsuirparser.parse(self.testdata)
        text =u''
        for studyday in studyweek:
             for lesson in studyday:
@@ -148,10 +148,22 @@ class TestGlobalFunctions(unittest.TestCase):
        self.assertEqual(text.strip(), testresult.strip())
 
     def testWeekNmber(self):
-        self.assertEqual(1, models.StudyWeek.getweeknum(2012,9,1))
-        self.assertEqual(2, models.StudyWeek.getweeknum(2012,9,3))
-        self.assertEqual(4, models.StudyWeek.getweeknum(2013,2,9))
-        self.assertEqual(None, models.StudyWeek.getweeknum(2013,40,40))
+        self.assertEqual(1, bsuirparser.getweeknum(2012,9,1))
+        self.assertEqual(2, bsuirparser.getweeknum(2012,9,3))
+        self.assertEqual(4, bsuirparser.getweeknum(2013,2,9))
+        self.assertEqual(None, bsuirparser.getweeknum(2013,40,40))
+
+    def testFullWeekDayNames(self):
+        studyweek = bsuirparser.parse(self.testdata)
+        testresult =u"Понедельник Вторник Среда Четверг Пятница Суббота"
+        res = []
+        for studyday in studyweek:
+            res.append(studyday.getFullName())
+        text = u" ".join(res)
+        self.assertEqual(text, testresult)
+
+
+
 
 
 if __name__ == '__main__':

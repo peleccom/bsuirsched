@@ -6,7 +6,7 @@ from lxml import etree
 import models
 import urllib
 import logging
-
+import datetime
 
 def fetch(group):
     u'''Скачать HTML с расписанием с bsuir.
@@ -37,14 +37,18 @@ def parse(tablestring, needsubgroup=None, needweek=None):
     if needsubgroup:
         try:
             needsubgroup = int(needsubgroup)
+            if 0>needsubgroup>2:
+                raise ValueError("Subgroup must be 1-4")
         except ValueError, e:
-            logging.error("Exception in bsuirparser.parse %s" % str(e))
+            logging.error("Exception in bsuirparser.parse '%s'" % str(e))
             return None
     if needweek:
         try:
             needweek = int(needweek)
+            if 1>needweek>4:
+                raise ValueError("Week must be 1-4")
         except ValueError, e:
-            logging.error("Exception in bsuirparser.parse %s" % str(e))
+            logging.error("Exception in bsuirparser.parse '%s'" % str(e))
             return None
 
     table = table[0]
@@ -78,3 +82,16 @@ def parse(tablestring, needsubgroup=None, needweek=None):
         stweek.append(stday)
     stweek = models.StudyWeek(stweek)
     return (stweek.filter(needsubgroup, needweek))
+
+def getweeknum(year, month, day):
+    '''Return week number'''
+    try:
+        if month >= 9:
+            startday = datetime.date(year, 9, 1)
+        else:
+            startday = datetime.date(year-1, 9, 1)
+        newweek = datetime.date(year, month, day).isocalendar()[1]
+        startweek = startday.isocalendar()[1]
+        return ((newweek - startweek) % 4) +1
+    except Exception:
+        return None

@@ -1,0 +1,61 @@
+<div class="well">
+{% if studyday %}
+<table class="table table-bordered table-condensed table-striped table-hover">
+  <caption>
+      <div class="well">
+          Группа {{ group }}<br />
+          {% if subgroup and subgroup != "0" %}
+          Подгруппа {{ subgroup }} <br />         
+          {% endif %}
+          {{ studyday.getFullName }}
+          {{ target_date|date:"d m Y" }}<br />
+          Неделя {{ weeknum }}
+      </div>
+  </caption>
+  <thead>
+    <tr><th>Недели</th><th>Время</th><th>Подгр.</th><th>Предмет</th><th>Тип</th><th>Аудит.</th><th>Преподаватель</th></tr>
+  </thead>
+<tbody>
+<tr>
+  <td>
+    {% for lesson in studyday  %}
+        <div>{{ lesson.getweeks }}<br></div>
+    {% endfor %}
+  </td>
+  <td>
+    {% for lesson in studyday  %}
+        <div>{{ lesson.gettime }}<br></div>
+    {% endfor %}
+  </td>
+  <td>
+    {% for lesson in studyday  %}
+        <div>{{ lesson.getsubgroup }}<br></div>
+    {% endfor %}
+  </td>
+  <td>
+    {% for lesson in studyday  %}
+        <div>{{ lesson.getsubject }}<br></div>
+    {% endfor %}
+  </td>
+  <td>
+    {% for lesson in studyday  %}
+        <div>{{ lesson.getlessontype }}<br></div>
+    {% endfor %}
+  </td>
+  <td>
+    {% for lesson in studyday  %}
+        <div>{{ lesson.getplace }}<br></div>
+    {% endfor %}
+  </td>
+  <td>
+    {% for lesson in studyday  %}
+        <div>{{ lesson.getlecturer }}<br></div>
+    {% endfor %}
+  </td>
+</tr>
+</tbody>
+</table>
+{% else %}
+<div class="pagination-centered text-warning">Нет занятий </div>
+{% endif %}
+</div>
