@@ -68,7 +68,7 @@
                 <li><a href="/home"><i class="icon-home icon-white"></i> На главную</a></li>
                 <li><a href="/dayschedule"><i class="icon-time icon-white"></i> Расписание на день</a></li>
                 {% if default_group %}
-                <li><a href="/"><i class="icon-user icon-white"></i> Группа {{ default_group.group }}</a></li>
+                <li><a href="/weekschedule?group={{ default_group.group|urlencode }}"><i class="icon-user icon-white"></i> Группа {{ default_group.group }}</a></li>
                 {% endif %}
             </ul>
         </div>
