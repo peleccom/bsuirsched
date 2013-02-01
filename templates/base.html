@@ -11,7 +11,11 @@
 <meta property="og:image" content="/static/img/student.jpeg"/>
     <!-- Bootstrap -->
     <link href="static/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-        <style type="text/css">
+  
+    {% block AdditionalCSS %}
+        
+    {% endblock AdditionalCSS %}
+    <style type="text/css">
 
       /* Sticky footer styles
       -------------------------------------------------- */
@@ -55,10 +59,9 @@
     <link rel="stylesheet" href="static/bootstrap/css/bootstrap-responsive.css">
     <!--Google analytics -->
     <script type="text/javascript">
-
-  var _gaq = _gaq || [];
-  _gaq.push(['_setAccount', 'UA-34673267-1']);
-  _gaq.push(['_trackPageview']);
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-34673267-1']);
+    _gaq.push(['_trackPageview']);
 
   (function() {
     var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
@@ -108,5 +111,8 @@
     <script src="static/bootstrap/js/bootstrap.min.js"></script>
     <script type="text/javascript" src="static/js/jquery.cookie.js"></script>
     <script type="text/javascript" src="static/js/script.js"></script>
+    {% block AdditionalJS %}
+        
+    {% endblock AdditionalJS %}
 </body>
 </html>

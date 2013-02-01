@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}
+  Расписание на день
+{% endblock title %}
+{% block AdditionalCSS %}
+  <link rel="stylesheet" href="static/datepicker/css/datepicker.css">
+{% endblock AdditionalCSS %}
+{% block content %}
+<form action="dayschedule" method="get" class="form-inline">
+  <fieldset class="pagination-centered">
+    <legend class="pagination-centered">Расписание на день</legend>
+    <label for="group">Группа</label>    
+    <input type="text" name="group" id="group" placeholder="Введите номер группы" class="input-medium" value="{{ default_group.group }}">
+    <label for="subgroup">Подгруппа</label>
+    <select name="subgroup" id="subgroup" class="input-small">
+      <option value="0" {% if default_group.subgroup == "0" %}selected{% endif %}>Все</option>
+      <option value="1" {% if default_group.subgroup == "1" %}selected{% endif %}>1</option>
+      <option value="2" {% if default_group.subgroup == "2" %}selected{% endif %}>2</option>
+    </select>
+    <hr>
+    <div class="well">
+      <label for="dp1">Дата</label><br />
+      <button class="btn btn-primary" onlick="return false">Сегодня</button>
+      <button class="btn btn-primary" onclik="return false">Завтра</button><hr />
+            <div class="input-append date" id="dp1" data-date="{% now "d-m-Y" %}" data-date-format="dd-mm-yyyy">
+              <input class="span2" size="16" type="text" value="{% now "d-m-Y" %}" readonly="" name="date">
+              <span class="add-on"><i class="icon-calendar"></i></span>
+            </div>
+    </div>
+    <button type="submit" class="btn">Получить расписание</button>
+  </fieldset>
+</form>
+
+<div class="schedulecontainer">
+  <div class="well"></div>
+</div>
+
+{% endblock content %}
+
+{% block AdditionalJS %}
+  <script type="text/javascript" src="static/datepicker/js/bootstrap-datepicker.js"></script>
+  <script type="text/javascript">
+      $(function(){
+          window.prettyPrint && prettyPrint();
+          // set date at client-side
+          date = new  Date();
+          $('#dp1').datepicker('setValue',""+date.getDate()+"-"+(date.getMonth()+1)+"-"+date.getFullYear());
+          $('#dp1').datepicker({weekStart:1});
+      });
+  </script>
+{% endblock AdditionalJS %}

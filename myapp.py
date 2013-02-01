@@ -93,8 +93,13 @@ class MainPage(webapp2.RequestHandler):
 
 class DaySchedulePage(webapp2.RequestHandler):
     def get(self):
-        return self.response.out.write("sddd")
-        pass
+        path = os.path.join(os.path.dirname(__file__),
+                                'templates', 'dayschedule.html')
+        self.response.out.write(template.render(path,
+                {
+                "default_group": hasdefaultgroup(self.request)
+                }
+                ))
 
 class GroupSchedulePage(webapp2.RequestHandler):
     def get(self):
