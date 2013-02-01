@@ -3,13 +3,13 @@
 <table class="table table-bordered table-condensed table-striped table-hover">
   <caption>
       <div class="well">
-          Группа {{ group }}<br />
+          Группа <span class="text-info"> {{ group }}</span><br />
           {% if subgroup and subgroup != "0" %}
-          Подгруппа {{ subgroup }} <br />         
+          Подгруппа <span class="text-info">{{ subgroup }}</span> <br />         
           {% endif %}
           {{ studyday.getFullName }}
-          {{ target_date|date:"d m Y" }}<br />
-          Неделя {{ weeknum }}
+          <span class="text-info"> {{ target_date|date:"d-m-Y" }}</span><br />
+          Неделя <span class="text-info"> {{ weeknum }}</span>
       </div>
   </caption>
   <thead>
