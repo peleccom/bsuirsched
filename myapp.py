@@ -12,8 +12,13 @@ import urllib
 import time
 
 
+from pytz.gae import pytz
+
+
 MAX_CACHING_TIME = 24 * 60 * 60
 MAX_DB_TIME = 5*24*60*60
+
+minsk_tz = pytz.timezone("Europe/Minsk")
 
 def fetchrawtable(group):
     data = memcache.get(group)
@@ -94,15 +99,21 @@ class MainPage(webapp2.RequestHandler):
 
 class DaySchedulePage(webapp2.RequestHandler):
 
-    def getajaxcontext(self):
-        group = self.request.get("group",None)
-        subgroup = self.request.get("subgroup",None)
-        date_str=self.request.get("date",None)
+    def getajaxcontext(self, date=None, group=None, subgroup=None):
+        group = self.request.POST.get("group", group)
+        subgroup = self.request.POST.get("subgroup",subgroup)
+        date_str=self.request.POST.get("date",date)
+        logging.info(date_str)
         try:
-            date = datetime.datetime.strptime(date_str, "%d-%m-%Y")
+            if date_str == "today":
+                date = (datetime.datetime.now(tz = pytz.utc)).astimezone(minsk_tz)
+            elif date_str == "tomorrow":
+                date = (datetime.datetime.now(tz = pytz.utc) + datetime.timedelta(days=1)).astimezone(minsk_tz)
+            else:
+
+                date = minsk_tz.localize(datetime.datetime.strptime(date_str, "%d-%m-%Y"))
         except Exception:
             # Wrong date
-            pass
             return
         if not group:
             return
@@ -128,15 +139,28 @@ class DaySchedulePage(webapp2.RequestHandler):
                 }
 
 
-    def get(self):
+    def get(self,date, group, subgroup):
+        default_group = hasdefaultgroup(self.request) or {}
+        if not group:
+            group = default_group.get("group",None)
+        if not subgroup:
+            subgroup = default_group.get("subgroup",None)
+        context = self.getajaxcontext(date, group, subgroup) or {}
+        now = datetime.datetime.now(tz = pytz.utc).astimezone(minsk_tz)
+        context.update({
+                "default_group": hasdefaultgroup(self.request),
+                "now_time":now
+                })
+
+        # Если не получены в параметрах подставляем стандартные
+        context["group"] = context.get("group", default_group.get("group", None))
+        context["subgroup"] = context.get("subgroup", default_group.get("subgroup", None))
         path = os.path.join(os.path.dirname(__file__),
                                 'templates', 'dayschedule.html')
         self.response.out.write(template.render(path,
-                {
-                "default_group": hasdefaultgroup(self.request)
-                }
+                    context
                 ))
-    def post(self):
+    def post(self, *args):
         context = self.getajaxcontext()
         if context:
             path = os.path.join(os.path.dirname(__file__),
@@ -184,8 +208,8 @@ class GroupSchedulePage(webapp2.RequestHandler):
 
 
 app = webapp2.WSGIApplication([
-                                ('/(home)?', MainPage),
-                                ('/weekschedule',GroupSchedulePage),
-                                ('/dayschedule',DaySchedulePage)
+                                (r'/(home)?', MainPage),
+                                (r'/weekschedule',GroupSchedulePage),
+                                (r'/dayschedule(?:/([^/]*))?(?:/([^/]*))?(?:/([^/]*))?',DaySchedulePage) # O_o
 
                                 ])

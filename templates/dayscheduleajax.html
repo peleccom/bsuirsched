@@ -56,6 +56,10 @@
 </tbody>
 </table>
 {% else %}
+{% if target_date %} {# Есть дата значит данные получены но это не учебный день #}
 <div class="pagination-centered text-warning">Нет занятий </div>
+{% else %} {# !target_date and ! study_day#}
+{# Пусто так как это обычный get-запрос #}
+{% endif %}
 {% endif %}
 </div>
