@@ -209,9 +209,21 @@ class GroupSchedulePage(webapp2.RequestHandler):
                 logging.debug(u"Ошибка при разборе расписания")
 
 
+class NotFoundPage(webapp2.RequestHandler):
+
+
+    def get(self):
+        path = os.path.join(os.path.dirname(__file__),
+                                    'templates', '404.html')
+        self.response.out.write(template.render(path,
+                                        {
+                                        "default_group": hasdefaultgroup(self.request)
+                                        }))
+
 app = webapp2.WSGIApplication([
                                 (r'/(home)?', MainPage),
                                 (r'/weekschedule',GroupSchedulePage),
-                                (r'/dayschedule(?:/([^/]*))?(?:/([^/]*))?(?:/([^/]*))?',DaySchedulePage) # O_o
+                                (r'/dayschedule(?:/([^/]*))?(?:/([^/]*))?(?:/([^/]*))?',DaySchedulePage), # O_o
+                                (r'/.*', NotFoundPage)
 
                                 ])
