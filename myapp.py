@@ -101,7 +101,7 @@ class DaySchedulePage(webapp2.RequestHandler):
 
     def getajaxcontext(self, date=None, group=None, subgroup=None):
         group = self.request.POST.get("group", group)
-        subgroup = self.request.POST.get("subgroup",subgroup)
+        subgroup = bsuirparser.subgroup2int(self.request.POST.get("subgroup",subgroup))
         date_str=self.request.POST.get("date",date)
         logging.info(date_str)
         try:
@@ -178,6 +178,8 @@ class GroupSchedulePage(webapp2.RequestHandler):
         group = self.request.get("group")
         subgroup = self.request.get("subgroup", None)
         week = self.request.get("week", None)
+        subgroup = bsuirparser.subgroup2int(subgroup)
+        week = bsuirparser.week2int(week)
         if not group: #main page
             self.redirect("/")
         else:

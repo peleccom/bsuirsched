@@ -35,20 +35,12 @@ def parse(tablestring, needsubgroup=None, needweek=None):
     if not table:
         return None
     if needsubgroup:
-        try:
-            needsubgroup = int(needsubgroup)
-            if 0>needsubgroup>2:
-                raise ValueError("Subgroup must be 1-4")
-        except ValueError, e:
-            logging.error("Exception in bsuirparser.parse '%s'" % str(e))
+        needsubgroup = subgroup2int(needsubgroup)
+        if not needsubgroup:
             return None
     if needweek:
-        try:
-            needweek = int(needweek)
-            if 1>needweek>4:
-                raise ValueError("Week must be 1-4")
-        except ValueError, e:
-            logging.error("Exception in bsuirparser.parse '%s'" % str(e))
+        needweek = week2int(needweek)
+        if not needweek:
             return None
 
     table = table[0]
@@ -95,3 +87,26 @@ def getweeknum(year, month, day):
         return ((newweek - startweek) % 4) +1
     except Exception:
         return None
+
+def subgroup2int(subgroup_str):
+    """Convert subgroup string to int with Value Error handling"""
+    try:
+        subgroup = int(subgroup_str)
+        if not 1<= subgroup <= 2:
+            raise ValueError("Subgroup must be 1-2")
+    except Exception, e:
+        logging.error("subgroup2int %s"%e)
+        subgroup = None
+    return subgroup
+
+
+def week2int(week_str):
+    """Convert week string to int with Value Error handling"""
+    try:
+        week = int(week_str)
+        if not 1 <= week <= 4:
+            raise ValueError("Week must be 1-4")
+    except Exception, e:
+        logging.error("week2int %s"%e)
+        week = None
+    return week
