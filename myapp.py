@@ -14,6 +14,13 @@ import time
 
 from pytz.gae import pytz
 
+os.environ['DJANGO_SETTINGS_MODULE'] = 'conf.settings'
+from django.conf import settings
+# Force Django to reload settings
+settings._target = None
+from django.utils import translation
+
+
 
 MAX_CACHING_TIME = 24 * 60 * 60
 MAX_DB_TIME = 5*24*60*60

@@ -7,6 +7,7 @@
           {% if subgroup and subgroup != "0" %}
           Подгруппа <span class="text-info">{{ subgroup }}</span> <br />         
           {% endif %}
+		  {{ target_date }}
           {{ studyday.getFullName }}
           <span class="text-info"> {{ target_date|date:"d-m-Y" }}</span><br />
           Неделя <span class="text-info"> {{ weeknum }}</span>
