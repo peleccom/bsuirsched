@@ -110,7 +110,6 @@ class DaySchedulePage(webapp2.RequestHandler):
         group = self.request.POST.get("group", group)
         subgroup = bsuirparser.subgroup2int(self.request.POST.get("subgroup",subgroup))
         date_str=self.request.POST.get("date",date)
-        logging.info(date_str)
         try:
             if date_str == "today":
                 date = (datetime.datetime.now(tz = pytz.utc)).astimezone(minsk_tz)

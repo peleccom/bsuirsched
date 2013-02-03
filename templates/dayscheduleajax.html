@@ -4,7 +4,7 @@
   <caption>
       <div class="well">
           Группа <span class="text-info"> {{ group }}</span><br />
-          {% if subgroup and subgroup != "0" %}
+          {% if subgroup and subgroup != 0 %}
           Подгруппа <span class="text-info">{{ subgroup }}</span> <br />         
           {% endif %}
           {{ studyday.getFullName }}

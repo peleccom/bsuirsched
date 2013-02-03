@@ -95,7 +95,6 @@ def subgroup2int(subgroup_str):
         if not 1<= subgroup <= 2:
             raise ValueError("Subgroup must be 1-2")
     except Exception, e:
-        logging.error("subgroup2int %s"%e)
         subgroup = None
     return subgroup
 
@@ -107,6 +106,5 @@ def week2int(week_str):
         if not 1 <= week <= 4:
             raise ValueError("Week must be 1-4")
     except Exception, e:
-        logging.error("week2int %s"%e)
         week = None
     return week
