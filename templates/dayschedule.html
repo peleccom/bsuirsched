@@ -20,11 +20,11 @@
     </select>
     <hr>
     <div class="well">
-      <label for="dp1">Дата</label><br />
+      <label for="dateid">Дата</label><br />
       <button class="btn btn-primary" id="TodayBtn" >Сегодня</button>
       <button class="btn btn-primary" id="tomorrowBtn">Завтра</button><hr />
             <div class="input-append date" id="dp1" data-date="{{ now_time|date:'d-m-Y' }}" data-date-format="dd-mm-yyyy">
-              <input class="span2" size="16" type="text" value="{{ now_time|date:'d-m-Y' }}" readonly="" name="date">
+              <input class="span2" size="16" type="text" value="{{ now_time|date:'d-m-Y' }}" readonly="" name="date" id="dateid">
               <span class="add-on"><i class="icon-calendar"></i></span>
             </div>
     </div>
