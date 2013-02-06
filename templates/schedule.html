@@ -72,7 +72,6 @@
 </tbody>
 </table>
 <br>
-
 <form action="weekschedule" method="get" class="form-inline pagination-centered">
   <fieldset>
     <legend>Расписание на неделю</legend>
@@ -95,4 +94,5 @@
     <button type="submit" class="btn">Получить расписание</button>
   </fieldset>
 </form>
+<small class="pull-right text-info">Последнее обновление с bsuir.by для этой группы : {{ fetcheddate|date:"d.m.Y H:m:s" }}</small>
 {% endblock content %}
