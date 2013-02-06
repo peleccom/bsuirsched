@@ -14,11 +14,11 @@ import time
 
 from pytz.gae import pytz
 
-os.environ['DJANGO_SETTINGS_MODULE'] = 'conf.settings'
-from django.conf import settings
-# Force Django to reload settings
-settings._target = None
-from django.utils import translation
+# os.environ['DJANGO_SETTINGS_MODULE'] = 'conf.settings'
+# from django.conf import settings
+# # Force Django to reload settings
+# settings._target = None
+# from django.utils import translation
 
 
 
@@ -28,10 +28,12 @@ MAX_DB_TIME = 5*24*60*60
 minsk_tz = pytz.timezone("Europe/Minsk")
 
 def fetchrawtable(group):
-    data = memcache.get(group)
-    if data is not None: # данные находятся в кэше
+    """Return dictionary with data and date keys or None"""
+    dicdata = memcache.get(group)
+
+    if dicdata is not None: # данные находятся в кэше
         logging.info("Get data for %s from cache" % group)
-        return data
+        return dicdata
     else:
         # Нет в кэше
         q = GroupSchedule.all()
@@ -41,22 +43,27 @@ def fetchrawtable(group):
             schedule = results[0]
             if (datetime.datetime.now() - schedule.date).total_seconds() < MAX_DB_TIME:
                 # в БД
-                memcache.set(group, schedule.text, MAX_CACHING_TIME)
-                logging.debug("Get data for %s from db and save to cache" % group)
-                return schedule.text
+                dicdata = {'data':schedule.text, 'date': schedule.date}
+                memcache.set(group, dicdata, MAX_CACHING_TIME)
+                logging.info("Get data for %s from db and save to cache" % group)
+                return dicdata
             else:
+                logging.info("Old data in DB for %s" % group)
                 # в БД просрочено, попытка нового запроса
                 data = bsuirparser.fetch(group)
                 if not data:
-                    memcache.set(group, schedule.text, MAX_CACHING_TIME)
-                    logging.debug("Data in DB is too old, but site isn't respond %s save to cache" % group)
-                    return schedule.text
+                    dicdata = {'data':schedule.text, 'date': schedule.date}
+                    memcache.set(group, dicdata , MAX_CACHING_TIME)
+                    logging.info("Data in DB is too old, but site isn't respond. Old data %s save to cache" % group)
+                    return dicdata
                 else:
                     schedule.delete()
-                    memcache.set(group, data, MAX_CACHING_TIME)
-                    logging.debug("Get new data for %s and save to cache" % group)
-                    GroupSchedule(group=group, text=data).put()
-                    return data
+                    dbrec = GroupSchedule(group=group, text=data)
+                    dbrec.put()
+                    dicdata = {'data':data, 'date': dbrec.date}
+                    memcache.set(group, dicdata, MAX_CACHING_TIME)
+                    logging.info("Get new data for %s and save to cache" % group)
+                    return dicdata
 
 
 
@@ -64,11 +71,15 @@ def fetchrawtable(group):
             data = bsuirparser.fetch(group)
             if not data:
                 logging.error("Fetching %s failed" % group)
-                return None
-            memcache.set(group, data, MAX_CACHING_TIME)
-            logging.debug("Get new data for %s and save to cache" % group)
-            GroupSchedule(group=group, text=data).put()
-            return data
+                dicdata = None
+                return dicdata
+            else:
+                dbrec = GroupSchedule(group=group, text=data)
+                dbrec.put()
+                dicdata = {'data':data, 'date': dbrec.date}
+                memcache.set(group, dicdata, MAX_CACHING_TIME)
+                logging.info("Get new data for %s and save to cache" % group)
+                return dicdata
 
 
 def hasdefaultgroup(request):
@@ -124,10 +135,11 @@ class DaySchedulePage(webapp2.RequestHandler):
         if not group:
             return
         else:
-            rawtable = fetchrawtable(group)
-            if not rawtable:
+            rawtableinfo = fetchrawtable(group)
+            if not rawtableinfo:
                 return
-                #error bsuir
+                #error bsuir parser
+        rawtable = rawtableinfo['data']
         weeknum = bsuirparser.getweeknum(date.year, date.month, date.day)
         if not weeknum:
             return
@@ -141,7 +153,8 @@ class DaySchedulePage(webapp2.RequestHandler):
                 "target_date": date,
                 "weeknum": weeknum,
                 "group": group,
-                "subgroup": subgroup
+                "subgroup": subgroup,
+                "fetcheddate": pytz.utc.localize(rawtableinfo["date"]).astimezone(minsk_tz)
                 }
 
 
@@ -189,8 +202,8 @@ class GroupSchedulePage(webapp2.RequestHandler):
         if not group: #main page
             self.redirect("/")
         else:
-            rawtable = fetchrawtable(group)
-            if not rawtable:
+            rawtableinfo = fetchrawtable(group)
+            if not rawtableinfo:
                 path = os.path.join(os.path.dirname(__file__),
                                     'templates', 'erroratbsuir.html')
                 self.response.out.write(template.render(path,
@@ -198,6 +211,7 @@ class GroupSchedulePage(webapp2.RequestHandler):
                                         "default_group": hasdefaultgroup(self.request)
                                         }))
                 return
+            rawtable = rawtableinfo['data']
             parsed = bsuirparser.parse(rawtable, subgroup, week)
             if parsed:
                 path = os.path.join(os.path.dirname(__file__),
@@ -206,7 +220,8 @@ class GroupSchedulePage(webapp2.RequestHandler):
                                         "group": group, "subgroup": subgroup,
                                         "selweek": week,
                                         "weeknumbers": range(1, 5),
-                                        "default_group": hasdefaultgroup(self.request)
+                                        "default_group": hasdefaultgroup(self.request),
+                "fetcheddate": pytz.utc.localize(rawtableinfo["date"]).astimezone(minsk_tz)
                                         })
                                         )
             else:
