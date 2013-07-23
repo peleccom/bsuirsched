@@ -180,6 +180,7 @@ class DaySchedulePage(webapp2.RequestHandler):
                     context
                 ))
     def post(self, *args):
+        logging.debug("Post params for dayschedule %s" % self.request.POST)
         context = self.getajaxcontext()
         if context:
             path = os.path.join(os.path.dirname(__file__),

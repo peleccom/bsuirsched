@@ -76,7 +76,7 @@
   <fieldset>
     <legend>Расписание на неделю</legend>
     <label for="group">Группа</label>    
-    <input type="text" name="group" id="group" placeholder="Введите номер группы" class="input-medium" value="{{ group }}">
+    <input type="text" name="group" id="group" placeholder="Введите номер группы" class="input-medium" value="{{ group }}" type="text" pattern="[0-9]*">
     <label for="subgroup">Подгруппа</label>
     <select name="subgroup" id="subgroup" class="input-small">
       <option value="0" {% if subgroup == 0 %}selected{% endif %}>Все</option>
