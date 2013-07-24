@@ -49,7 +49,7 @@
   </td>
   <td>
     {% for lesson in day  %}
-        <div>{{ lesson.getsubject }}<br></div>
+        <div {% if lesson.getlessontype != "лк" %}class="practical_lesson"{% endif %}>{{ lesson.getsubject }}<br></div>
     {% endfor %}
   </td>
   <td>
