@@ -24,43 +24,49 @@ from pytz.gae import pytz
 
 MAX_CACHING_TIME = 24 * 60 * 60
 MAX_DB_TIME = 5*24*60*60
+DICTDATA_SCHEDULE_KEY_NAME = 'schedule'
+DICTDATA_DATE_KEY_NAME = 'date'
 
 minsk_tz = pytz.timezone("Europe/Minsk")
 
-def fetchrawtable(group):
-    """Return dictionary with data and date keys or None"""
-    dicdata = memcache.get(group)
+def getgroupdata(group):
+    """Return dictionary with schedule and date keys or None"""
+    groupdata = memcache.get('group%s' % (group))
 
-    if dicdata is not None: # данные находятся в кэше
+    if groupdata is not None: # данные находятся в кэше
         logging.info("Get data for %s from cache" % group)
-        return dicdata
+        return groupdata
     else:
         # Нет в кэше
-        q = GroupSchedule.all()
-        q.filter("group = ", group)
-        results = q.fetch(1)
-        if results:
-            schedule = results[0]
-            if (datetime.datetime.now() - schedule.date).total_seconds() < MAX_DB_TIME:
+        groupschedule = GroupSchedule.query(GroupSchedule.group == group).get() # TODO: .get_by_id(...)
+        if groupschedule:
+            if (datetime.datetime.now() - groupschedule.date).total_seconds() < MAX_DB_TIME:
                 # в БД
-                dicdata = {'data':schedule.text, 'date': schedule.date}
-                memcache.set(group, dicdata, MAX_CACHING_TIME)
+                dicdata = {
+                    DICTDATA_SCHEDULE_KEY_NAME : groupschedule.schedule,
+                    DICTDATA_DATE_KEY_NAME : groupschedule.date
+                }
+                memcache.set('group%s' % group, dicdata, MAX_CACHING_TIME)
                 logging.info("Get data for %s from db and save to cache" % group)
                 return dicdata
             else:
                 logging.info("Old data in DB for %s" % group)
                 # в БД просрочено, попытка нового запроса
-                data = bsuirparser.fetch(group)
-                if not data:
-                    dicdata = {'data':schedule.text, 'date': schedule.date}
-                    memcache.set(group, dicdata , MAX_CACHING_TIME)
+                schedhtml = bsuirparser.fetch(group)
+                if not schedhtml:
+                    dicdata = {
+                        DICTDATA_SCHEDULE_KEY_NAME: groupschedule.schedule,
+                        DICTDATA_DATE_KEY_NAME: groupschedule.date
+                    }
+                    memcache.set('group%s' % group, dicdata , MAX_CACHING_TIME)
                     logging.info("Data in DB is too old, but site isn't respond. Old data %s save to cache" % group)
                     return dicdata
                 else:
-                    schedule.delete()
-                    dbrec = GroupSchedule(group=group, text=data)
+                    groupschedule.key.delete()
+                    studyweek = bsuirparser.parse(schedhtml)
+                    dbrec = GroupSchedule(group=group, schedule=studyweek)
                     dbrec.put()
-                    dicdata = {'data':data, 'date': dbrec.date}
+                    dicdata = {DICTDATA_SCHEDULE_KEY_NAME:data, DICTDATA_DATE_KEY_NAME: dbrec.date}
                     memcache.set(group, dicdata, MAX_CACHING_TIME)
                     logging.info("Get new data for %s and save to cache" % group)
                     return dicdata
@@ -68,15 +74,21 @@ def fetchrawtable(group):
 
 
         else: # нет в БД
-            data = bsuirparser.fetch(group)
-            if not data:
+            schedhtml = bsuirparser.fetch(group)
+            if not schedhtml:
                 logging.error("Fetching %s failed" % group)
-                dicdata = None
-                return dicdata
+                return None
             else:
-                dbrec = GroupSchedule(group=group, text=data)
+                studyweek = bsuirparser.parse(schedhtml)
+                if not studyweek:
+                    logging.error("Parsing %s failed" % group)
+                    return None
+                dbrec = GroupSchedule(group=group, schedule=studyweek)
                 dbrec.put()
-                dicdata = {'data':data, 'date': dbrec.date}
+                dicdata = {
+                    DICTDATA_SCHEDULE_KEY_NAME : studyweek,
+                    DICTDATA_DATE_KEY_NAME : dbrec.date
+                }
                 memcache.set(group, dicdata, MAX_CACHING_TIME)
                 logging.info("Get new data for %s and save to cache" % group)
                 return dicdata
@@ -135,11 +147,11 @@ class DaySchedulePage(webapp2.RequestHandler):
         if not group:
             return
         else:
-            rawtableinfo = fetchrawtable(group)
+            rawtableinfo = getgroupdata(group)
             if not rawtableinfo:
                 return
                 #error bsuir parser
-        rawtable = rawtableinfo['data']
+        rawtable = rawtableinfo[DICTDATA_SCHEDULE_KEY_NAME]
         weeknum = bsuirparser.getweeknum(date.year, date.month, date.day)
         if not weeknum:
             return
@@ -203,8 +215,8 @@ class GroupSchedulePage(webapp2.RequestHandler):
         if not group: #main page
             self.redirect("/")
         else:
-            rawtableinfo = fetchrawtable(group)
-            if not rawtableinfo:
+            groupdata = getgroupdata(group)
+            if not groupdata:
                 path = os.path.join(os.path.dirname(__file__),
                                     'templates', 'erroratbsuir.html')
                 self.response.out.write(template.render(path,
@@ -212,17 +224,16 @@ class GroupSchedulePage(webapp2.RequestHandler):
                                         "default_group": hasdefaultgroup(self.request)
                                         }))
                 return
-            rawtable = rawtableinfo['data']
-            parsed = bsuirparser.parse(rawtable, subgroup, week)
-            if parsed:
+            studyweek = groupdata[DICTDATA_SCHEDULE_KEY_NAME]
+            if studyweek:
                 path = os.path.join(os.path.dirname(__file__),
                                     'templates', 'schedule.html')
-                self.response.out.write(template.render(path, {"week": parsed,
+                self.response.out.write(template.render(path, {"week": studyweek,
                                         "group": group, "subgroup": subgroup,
                                         "selweek": week,
                                         "weeknumbers": range(1, 5),
                                         "default_group": hasdefaultgroup(self.request),
-                "fetcheddate": pytz.utc.localize(rawtableinfo["date"]).astimezone(minsk_tz)
+                "fetcheddate": pytz.utc.localize(groupdata["date"]).astimezone(minsk_tz)
                                         })
                                         )
             else:

@@ -28,7 +28,7 @@ nosetests.xml
 
 # Translations
 *.mo
-
+.idea
 # Mr Developer
 .mr.developer.cfg
 .project

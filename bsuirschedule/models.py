@@ -1,25 +1,6 @@
 #!/usr/bin/env python
 # -*- coding: UTF-8 -*-
 
-class Lecturer(object):
-    def __init__(self, name):
-        self.name = name
-
-    def getname(self):
-        return self.name
-
-    def __str__(self):
-        return (self.name)
-
-
-class Subject(object):
-    def __init__(self, title):
-        self.title = title
-
-    def __unicode__(self):
-        return self.title
-
-
 class Lesson(object):
     def __init__(self, weeks, time, subgroup, subject, lessontype, place, lecturer):
         '''
@@ -37,7 +18,7 @@ class Lesson(object):
             self._weeks = []
             if isinstance(weeks, basestring):
                 try:
-                    self._weeks = [int(week)for week in weeks.split(",")]
+                    self._weeks = [int(week)for week in weeks.strip().split(",")]
                 except:
                     ValueError("Wrong week string %s" % weeks)
             else:

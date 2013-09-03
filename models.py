@@ -1,8 +1,8 @@
 # -*- coding: UTF-8 -*-
-from google.appengine.ext import db
+from google.appengine.ext import ndb
 
 
-class GroupSchedule(db.Model):
-    group = db.StringProperty(required=True)
-    text = db.TextProperty()
-    date = db.DateTimeProperty(auto_now=True)
+class GroupSchedule(ndb.Model):
+    group = ndb.StringProperty(required=True)
+    schedule = ndb.PickleProperty()
+    date = ndb.DateTimeProperty(auto_now=True)

@@ -34,19 +34,10 @@ def parse(tablestring, needsubgroup=None, needweek=None):
     table = root.xpath(".//table")
     if not table:
         return None
-    if needsubgroup:
-        needsubgroup = subgroup2int(needsubgroup)
-        if not needsubgroup:
-            return None
-    if needweek:
-        needweek = week2int(needweek)
-        if not needweek:
-            return None
-
     table = table[0]
     days = table.xpath("//tr")
     days = days[1:]
-    stweek = []
+    stdays = []
     for day in days:
         name = day.xpath("td[1]")[0]
 ##        print name.text
@@ -71,9 +62,9 @@ def parse(tablestring, needsubgroup=None, needweek=None):
                                 lessontypes[i], places[i], lecturers[i])
             lessons.append(les)
         stday = models.StudyDay(lessons, name.text)
-        stweek.append(stday)
-    stweek = models.StudyWeek(stweek)
-    return (stweek.filter(needsubgroup, needweek))
+        stdays.append(stday)
+    stweek = models.StudyWeek(stdays)
+    return stweek
 
 def getweeknum(year, month, day):
     '''Return week number'''
