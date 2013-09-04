@@ -29,7 +29,7 @@ DICTDATA_DATE_KEY_NAME = 'date'
 
 minsk_tz = pytz.timezone("Europe/Minsk")
 
-def getgroupdata(group):
+def get_group_data(group):
     """Return dictionary with schedule and date keys or None"""
     groupdata = memcache.get('group%s' % (group))
 
@@ -66,7 +66,10 @@ def getgroupdata(group):
                     studyweek = bsuirparser.parse(schedhtml)
                     dbrec = GroupSchedule(group=group, schedule=studyweek)
                     dbrec.put()
-                    dicdata = {DICTDATA_SCHEDULE_KEY_NAME:data, DICTDATA_DATE_KEY_NAME: dbrec.date}
+                    dicdata = {
+                        DICTDATA_SCHEDULE_KEY_NAME: studyweek,
+                        DICTDATA_DATE_KEY_NAME: dbrec.date
+                    }
                     memcache.set(group, dicdata, MAX_CACHING_TIME)
                     logging.info("Get new data for %s and save to cache" % group)
                     return dicdata
@@ -94,7 +97,7 @@ def getgroupdata(group):
                 return dicdata
 
 
-def hasdefaultgroup(request):
+def get_preferred_group_params(request):
     '''Return stored default group info'''
     if not request.cookies.has_key("default_group"):
         return None
@@ -109,7 +112,7 @@ class MainPage(webapp2.RequestHandler):
     def get(self, additional_path):
         #Проверить куку и если установлена оправить напрямую
         if not additional_path:
-            default_group_dic = hasdefaultgroup(self.request)
+            default_group_dic = get_preferred_group_params(self.request)
             if default_group_dic:
                 try:
                     query_str = urllib.urlencode(default_group_dic)
@@ -122,14 +125,14 @@ class MainPage(webapp2.RequestHandler):
                                 'templates', 'index.html')
         self.response.out.write(template.render(path,
                 {
-                "default_group": hasdefaultgroup(self.request)
+                "default_group": get_preferred_group_params(self.request)
                 }
                 ))
         return
 
 class DaySchedulePage(webapp2.RequestHandler):
 
-    def getajaxcontext(self, date=None, group=None, subgroup=None):
+    def get_ajax_context(self, date=None, group=None, subgroup=None):
         group = self.request.POST.get("group", group)
         subgroup = bsuirparser.subgroup2int(self.request.POST.get("subgroup",subgroup))
         date_str=self.request.POST.get("date",date)
@@ -139,7 +142,6 @@ class DaySchedulePage(webapp2.RequestHandler):
             elif date_str == "tomorrow":
                 date = (datetime.datetime.now(tz = pytz.utc) + datetime.timedelta(days=1)).astimezone(minsk_tz)
             else:
-
                 date = minsk_tz.localize(datetime.datetime.strptime(date_str, "%d-%m-%Y"))
         except Exception:
             # Wrong date
@@ -147,40 +149,42 @@ class DaySchedulePage(webapp2.RequestHandler):
         if not group:
             return
         else:
-            rawtableinfo = getgroupdata(group)
-            if not rawtableinfo:
+            group_data = get_group_data(group)
+            if not group_data:
                 return
                 #error bsuir parser
-        rawtable = rawtableinfo[DICTDATA_SCHEDULE_KEY_NAME]
+        studyweek = group_data[DICTDATA_SCHEDULE_KEY_NAME]
         weeknum = bsuirparser.getweeknum(date.year, date.month, date.day)
+        studyweek = studyweek.filter(subgroup, weeknum)
         if not weeknum:
             return
             #incorrectdate
-        parsed = bsuirparser.parse(rawtable,subgroup,weeknum)
-        if parsed:
-            studyday = parsed.getDay(date.weekday())
+        if studyweek:
+            studyday = studyweek.getDay(date.weekday())
+            if not studyday:
+                return
             return {
-                "default_group": hasdefaultgroup(self.request),
-                "studyday":studyday,
+                "default_group": get_preferred_group_params(self.request),
+                "studyday": studyday,
                 "target_date": date,
                 "weeknum": weeknum,
                 "group": group,
                 "subgroup": subgroup,
-                "fetcheddate": pytz.utc.localize(rawtableinfo["date"]).astimezone(minsk_tz)
+                "fetcheddate": pytz.utc.localize(group_data[DICTDATA_DATE_KEY_NAME]).astimezone(minsk_tz)
                 }
 
 
     def get(self,date, group, subgroup):
-        default_group = hasdefaultgroup(self.request) or {}
+        default_group = get_preferred_group_params(self.request) or {}
         if not group:
             group = default_group.get("group",None)
         if not subgroup:
             subgroup = default_group.get("subgroup",None)
-        context = self.getajaxcontext(date, group, subgroup) or {}
+        context = self.get_ajax_context(date, group, subgroup) or {}
         now = datetime.datetime.now(tz = pytz.utc).astimezone(minsk_tz)
         context.update({
-                "default_group": hasdefaultgroup(self.request),
-                "now_time":now
+                "default_group": get_preferred_group_params(self.request),
+                "now_time": now
                 })
 
         # Если не получены в параметрах подставляем стандартные
@@ -191,9 +195,10 @@ class DaySchedulePage(webapp2.RequestHandler):
         self.response.out.write(template.render(path,
                     context
                 ))
+
     def post(self, *args):
         logging.debug("Post params for dayschedule %s" % self.request.POST)
-        context = self.getajaxcontext()
+        context = self.get_ajax_context()
         if context:
             path = os.path.join(os.path.dirname(__file__),
                                'templates', 'dayscheduleajax.html')
@@ -205,34 +210,35 @@ class DaySchedulePage(webapp2.RequestHandler):
 
 
 class GroupSchedulePage(webapp2.RequestHandler):
-    def get(self):
 
+    def get(self):
         group = self.request.get("group")
         subgroup = self.request.get("subgroup", None)
-        week = self.request.get("week", None)
+        week_num = self.request.get("week", None)
         subgroup = bsuirparser.subgroup2int(subgroup)
-        week = bsuirparser.week2int(week)
+        week_num = bsuirparser.week2int(week_num)
         if not group: #main page
             self.redirect("/")
         else:
-            groupdata = getgroupdata(group)
+            groupdata = get_group_data(group)
             if not groupdata:
                 path = os.path.join(os.path.dirname(__file__),
                                     'templates', 'erroratbsuir.html')
                 self.response.out.write(template.render(path,
                                         {'group': group,
-                                        "default_group": hasdefaultgroup(self.request)
+                                        "default_group": get_preferred_group_params(self.request)
                                         }))
                 return
-            studyweek = groupdata[DICTDATA_SCHEDULE_KEY_NAME]
-            if studyweek:
+            study_week = groupdata[DICTDATA_SCHEDULE_KEY_NAME]
+            if study_week:
+                study_week = study_week.filter(subgroup, week_num)
                 path = os.path.join(os.path.dirname(__file__),
                                     'templates', 'schedule.html')
-                self.response.out.write(template.render(path, {"week": studyweek,
+                self.response.out.write(template.render(path, {"week": study_week,
                                         "group": group, "subgroup": subgroup,
-                                        "selweek": week,
+                                        "selweek": week_num,
                                         "weeknumbers": range(1, 5),
-                                        "default_group": hasdefaultgroup(self.request),
+                                        "default_group": get_preferred_group_params(self.request),
                 "fetcheddate": pytz.utc.localize(groupdata["date"]).astimezone(minsk_tz)
                                         })
                                         )
@@ -250,7 +256,7 @@ class NotFoundPage(webapp2.RequestHandler):
                                     'templates', '404.html')
         self.response.out.write(template.render(path,
                                         {
-                                        "default_group": hasdefaultgroup(self.request)
+                                        "default_group": get_preferred_group_params(self.request)
                                         }))
 
 app = webapp2.WSGIApplication([

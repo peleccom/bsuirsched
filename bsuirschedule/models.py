@@ -190,7 +190,10 @@ class StudyWeek(object):
         '''Return Studyday with number'''
         if day>5:
             return None
-        return self.studydays[day]
+        try:
+            return self.studydays[day]
+        except IndexError:
+            return None
 
     def __unicode__(self):
         s = u""
