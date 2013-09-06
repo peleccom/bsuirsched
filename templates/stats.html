@@ -1,0 +1,79 @@
+{% extends "base.html" %}
+{% block title %}
+  Информация {{ group }}
+{% endblock title %}
+{% block content %}
+    <div class="pagination-centered well">Статистика группы <span class="text-info">{{ group }}</span></div>
+    <div class="row-fluid">
+        <div class="span4">
+            <table class="table table-bordered">
+                <thead>
+                <tr>
+                    <th>Преподаватели</th>
+                    <th>Предмет</th>
+                    <th>Вид занятия</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for lecturer, subjects_dict in lecturers_summary_list  %}
+                    {% for subject, lesson_types in subjects_dict.items %}
+                        <tr>
+                            <td><a href="http://google.ru/#q={{ lecturer|urlencode }}" target="_blank">{{ lecturer }}</a></td>
+                            <td>{{ subject }}</td>
+                            <td>{{ lesson_types|join:", " }}</td>
+                        </tr>
+                    {% endfor %}
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+            <div class="span6">
+                <div id="chart1"></div>
+            </div>
+        <div class="span2">
+            <table class="table table-bordered">
+                <thead>
+                <tr><th>Учебные аудитории</th></tr>
+                </thead>
+                <tbody>
+                {% for place in places  %}
+                    <tr><td>{{ place }}</td></tr>
+                {% endfor %}
+
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+{% endblock content %}
+{% block AdditionalJS %}
+    <!--[if lt IE 9]><script language="javascript" type="text/javascript" src="/static/jquery/jqPlot_v1.0.8/excanvas.js"></script><![endif]-->
+    <script language="javascript" type="text/javascript" src="/static/jquery/jqPlot_v1.0.8/jquery.jqplot.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="/static/jquery/jqPlot_v1.0.8/jquery.jqplot.min.css" />
+    <script type="text/javascript" src="/static/jquery/jqPlot_v1.0.8/jqplot.pieRenderer.min.js"></script>
+    <script type="text/javascript" src="/static/jquery/jqPlot_v1.0.8/jqplot.donutRenderer.min.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function(){
+            var data = [
+                    {% for subject,count in subjects_stat.items %}
+                    ['{{ subject }}', {{ count }}],
+                    {% endfor %}
+            ];
+            var plot1 = jQuery.jqplot ('chart1', [data],
+                    {
+                        title : 'Количество занятий',
+                        seriesDefaults: {
+                            // Make this a pie chart.
+                            renderer: jQuery.jqplot.PieRenderer,
+                            rendererOptions: {
+                                // Put data labels on the pie slices.
+                                // By default, labels show the percentage of the slice.
+                                showDataLabels: true
+                            }
+                        },
+                        legend: { show:true, location: 'e' }
+                    }
+            );
+        });
+    </script>
+{% endblock AdditionalJS %}

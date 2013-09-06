@@ -9,7 +9,6 @@ from bsuirschedule import bsuirparser
 from models import GroupSchedule
 import datetime
 import urllib
-import time
 
 
 from pytz.gae import pytz
@@ -38,13 +37,13 @@ def get_group_data(group):
         return groupdata
     else:
         # Нет в кэше
-        groupschedule = GroupSchedule.query(GroupSchedule.group == group).get() # TODO: .get_by_id(...)
-        if groupschedule:
-            if (datetime.datetime.now() - groupschedule.date).total_seconds() < MAX_DB_TIME:
+        group_schedule = GroupSchedule.query(GroupSchedule.group == group).get() # TODO: .get_by_id(...)
+        if group_schedule:
+            if (datetime.datetime.now() - group_schedule.date).total_seconds() < MAX_DB_TIME:
                 # в БД
                 dicdata = {
-                    DICTDATA_SCHEDULE_KEY_NAME : groupschedule.schedule,
-                    DICTDATA_DATE_KEY_NAME : groupschedule.date
+                    DICTDATA_SCHEDULE_KEY_NAME : group_schedule.schedule,
+                    DICTDATA_DATE_KEY_NAME : group_schedule.date
                 }
                 memcache.set('group%s' % group, dicdata, MAX_CACHING_TIME)
                 logging.info("Get data for %s from db and save to cache" % group)
@@ -55,14 +54,14 @@ def get_group_data(group):
                 schedhtml = bsuirparser.fetch(group)
                 if not schedhtml:
                     dicdata = {
-                        DICTDATA_SCHEDULE_KEY_NAME: groupschedule.schedule,
-                        DICTDATA_DATE_KEY_NAME: groupschedule.date
+                        DICTDATA_SCHEDULE_KEY_NAME: group_schedule.schedule,
+                        DICTDATA_DATE_KEY_NAME: group_schedule.date
                     }
                     memcache.set('group%s' % group, dicdata , MAX_CACHING_TIME)
                     logging.info("Data in DB is too old, but site isn't respond. Old data %s save to cache" % group)
                     return dicdata
                 else:
-                    groupschedule.key.delete()
+                    group_schedule.key.delete()
                     studyweek = bsuirparser.parse(schedhtml)
                     dbrec = GroupSchedule(group=group, schedule=studyweek)
                     dbrec.put()
@@ -98,15 +97,15 @@ def get_group_data(group):
 
 
 def get_preferred_group_params(request):
-    '''Return stored default group info'''
+    """Return stored default group info"""
     if not request.cookies.has_key("default_group"):
         return None
-    groupdic = {}
-    groupdic["group"] = request.cookies.get("default_group")
+    group_dic = {}
+    group_dic["group"] = request.cookies.get("default_group")
     subgroup = request.cookies.get("default_subgroup", None)
     if subgroup:
-        groupdic["subgroup"] = subgroup
-    return groupdic
+        group_dic["subgroup"] = subgroup
+    return group_dic
 
 class MainPage(webapp2.RequestHandler):
     def get(self, additional_path):
@@ -154,15 +153,13 @@ class DaySchedulePage(webapp2.RequestHandler):
                 return
                 #error bsuir parser
         studyweek = group_data[DICTDATA_SCHEDULE_KEY_NAME]
-        weeknum = bsuirparser.getweeknum(date.year, date.month, date.day)
+        weeknum = bsuirparser.get_week_num(date.year, date.month, date.day)
         studyweek = studyweek.filter(subgroup, weeknum)
         if not weeknum:
             return
             #incorrectdate
         if studyweek:
-            studyday = studyweek.getDay(date.weekday())
-            if not studyday:
-                return
+            studyday = studyweek.get_day(date.weekday())
             return {
                 "default_group": get_preferred_group_params(self.request),
                 "studyday": studyday,
@@ -248,6 +245,56 @@ class GroupSchedulePage(webapp2.RequestHandler):
                 logging.debug(u"Ошибка при разборе расписания")
 
 
+class StatPage(webapp2.RequestHandler):
+
+    def get(self):
+        def lecturers_cmp(a, b):
+            """Опустить все пустые имена вниз"""
+            if a[0] == b[0]:
+                return 0
+            if a[0] == "":
+                return 1
+            if b[0] == "":
+                return -1
+            return cmp(a,b)
+
+        group = self.request.get("group", None)
+        default_group = get_preferred_group_params(self.request)['group']
+        if not group:
+            group = default_group
+        if not group:
+            self.response.headers['Content-Type'] = 'text/plain'
+            self.response.out.write(u"Не указана группа")
+            logging.debug(u"group param is None")
+            return
+        group_data = get_group_data(group)
+        if not group_data:
+            path = os.path.join(os.path.dirname(__file__),
+                'templates', 'erroratbsuir.html')
+            self.response.out.write(template.render(path,
+                    {'group': group,
+                     "default_group": get_preferred_group_params(self.request)
+                }))
+            return
+        study_week = group_data[DICTDATA_SCHEDULE_KEY_NAME]
+        places = study_week.get_places_list()
+        lecturers_summary = study_week.get_lecturers_summary()
+        lecturers_summary_list = lecturers_summary.items()
+        lecturers_summary_list.sort(lecturers_cmp)
+        subjects_stat = study_week.get_subjects_stat()
+        # Нельзя корректно посчитать
+        subjects_stat.pop(u"Спецподготовка", None)
+        path = os.path.join(os.path.dirname(__file__),
+            'templates', 'stats.html')
+        self.response.out.write(template.render(path,
+            {
+            "default_group": get_preferred_group_params(self.request),
+            "places": places,
+            "lecturers_summary_list": lecturers_summary_list,
+            "group": group,
+            "subjects_stat": subjects_stat,
+            }))
+
 class NotFoundPage(webapp2.RequestHandler):
 
 
@@ -263,6 +310,7 @@ app = webapp2.WSGIApplication([
                                 (r'/(home)?', MainPage),
                                 (r'/weekschedule',GroupSchedulePage),
                                 (r'/dayschedule(?:/([^/]*))?(?:/([^/]*))?(?:/([^/]*))?',DaySchedulePage), # O_o
+                                (r'/stats', StatPage),
                                 (r'/.*', NotFoundPage)
 
                                 ])
