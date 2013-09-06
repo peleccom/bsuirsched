@@ -57,7 +57,7 @@
     </style>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="/static/bootstrap/v2.2.2/css/bootstrap-responsive.css">
-	<link rel="stylesheet" href="/static/css/v1/style.css">
+	<link rel="stylesheet" href="/static/css/v2/style.css">
 </head>
 <body>
 <div id="wrap">
@@ -73,6 +73,8 @@
                 <li><a href="/"><i class="icon-user icon-white"></i> Группа {{ default_group.group }}</a></li>
                 <li><a href="/dayschedule/today">На сегодня</a></li>
                 <li><a href="/dayschedule/tomorrow">На завтра</a></li>
+                <li class="divider-vertical"></li>
+                <li><a href="/stats">Статистика</a></li>
                {% endif %}
             </ul>
         </div>
