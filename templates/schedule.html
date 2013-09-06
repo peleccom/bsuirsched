@@ -5,8 +5,8 @@
 {% block content %}
 <div class="pull-right btn-toolbar">
   
-<button class="btn {% if not default_group or default_group.group != group %}hide{% endif %}" id="DeleteDefaultButton" title="Начинать с главной страницы" onclick="DeleteDefaultGroup();"><i class="icon-trash"></i> Это не моя группа</button>
-<button class="btn {% if not default_group or default_group.group == group %}btn-primary{% endif %} {% if default_group and default_group.group == group %}hide{% endif %}" id="SetDefaultButton" title="Запомнить группу" onclick="SetDefaultGroup('{{ group }}');"><i class="icon-star"></i> Это моя группа</button>
+<button class="btn {% if not default_group or default_group.group != group %}hide{% endif %}" id="DeleteDefaultButton" title="Начинать с главной страницы" onclick="DeleteDefaultGroup();window.location.reload(true);"><i class="icon-trash"></i> Это не моя группа</button>
+<button class="btn {% if not default_group or default_group.group == group %}btn-primary{% endif %} {% if default_group and default_group.group == group %}hide{% endif %}" id="SetDefaultButton" title="Запомнить группу" onclick="SetDefaultGroup('{{ group }}');window.location.reload(true);"><i class="icon-star"></i> Это моя группа</button>
 </div>
 <table class="table table-bordered table-condensed table-striped table-hover">
 <caption>
