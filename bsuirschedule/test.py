@@ -148,21 +148,34 @@ class TestGlobalFunctions(unittest.TestCase):
        self.assertEqual(text.strip(), testresult.strip())
 
     def testWeekNmber(self):
-        self.assertEqual(1, bsuirparser.getweeknum(2012,9,1))
-        self.assertEqual(2, bsuirparser.getweeknum(2012,9,3))
-        self.assertEqual(4, bsuirparser.getweeknum(2013,2,9))
-        self.assertEqual(None, bsuirparser.getweeknum(2013,40,40))
+        self.assertEqual(1, bsuirparser.get_week_num(2012,9,1))
+        self.assertEqual(2, bsuirparser.get_week_num(2012,9,3))
+        self.assertEqual(4, bsuirparser.get_week_num(2013,2,9))
+        self.assertEqual(None, bsuirparser.get_week_num(2013,40,40))
 
     def testFullWeekDayNames(self):
         studyweek = bsuirparser.parse(self.testdata)
         testresult =u"Понедельник Вторник Среда Четверг Пятница Суббота"
         res = []
         for studyday in studyweek:
-            res.append(studyday.getFullName())
+            res.append(studyday.get_full_name())
         text = u" ".join(res)
         self.assertEqual(text, testresult)
 
-
+    def testLessonType(self):
+        a1 = models.LessonType(u'лк')
+        a11 = models.LessonType(u'лк')
+        a2 = models.LessonType(u'пз')
+        a3 = models.LessonType(u'лр')
+        a4 = models.LessonType(u'ф')
+        a5 = models.LessonType(models.LessonType.LEC)
+        self.assertTrue(a1 == a11)
+        self.assertTrue(a1 != a2)
+        self.assertTrue(a3.is_lab())
+        self.assertTrue(a2.is_pr())
+        self.assertTrue(a1 == a5)
+        self.assertTrue(a4 != a5 )
+        self.assertTrue(a4 == models.LessonType(models.LessonType.NO_TYPE) )
 
 
 
