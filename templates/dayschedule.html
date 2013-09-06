@@ -57,6 +57,10 @@
           $('#ajaxForm').ajaxSubmit({target:"#schedulecontainer",success:scrollDown});            
           });
 
+          $('#subgroup').on("change",function(){
+              $('#ajaxForm').ajaxSubmit({target:"#schedulecontainer",success:scrollDown});
+          });
+
 
           $("#TodayBtn").click(function(){
               date = new  Date();
