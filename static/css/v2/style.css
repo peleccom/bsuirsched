@@ -1,0 +1,9 @@
+.practical_lesson {
+color:red;
+}
+
+.center {
+     float: none;
+     margin-left: auto;
+     margin-right: auto;
+}
