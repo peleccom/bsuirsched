@@ -3,21 +3,20 @@
 
 
 from lxml import etree
-import models
 import urllib
 import logging
 import datetime
+import models
+
 
 def fetch(group):
     u'''Скачать HTML с расписанием с bsuir.
     Возвращает строку с html-разметкой таблицы или None'''
     try:
         parser = etree.HTMLParser(encoding="utf8")
-        url = "http://www.bsuir.by/psched/schedulegroup?group=%s" % group
-        #url = "http://127.0.0.1:8000/%s.htm" % group
-
-        rawhtml = urllib.urlopen(url).read()
-        root = etree.HTML(rawhtml, parser=parser)
+        url = "http://www.bsuir.by/psched/schedulegroup?group=%s" % urllib.quote(group)
+        raw_html = urllib.urlopen(url).read()
+        root = etree.HTML(raw_html, parser=parser)
         table = root.xpath(".//*[@id='tableZone']/table")
         if table:
             return etree.tostring(table[0], encoding="unicode")
@@ -28,7 +27,7 @@ def fetch(group):
         return None
 
 
-def parse(tablestring, needsubgroup=None, needweek=None):
+def parse(tablestring):
     u'''Распарсить таблицу в объект StudyWeek'''
     root = etree.HTML(tablestring)
     table = root.xpath(".//table")
@@ -37,7 +36,7 @@ def parse(tablestring, needsubgroup=None, needweek=None):
     table = table[0]
     days = table.xpath("//tr")
     days = days[1:]
-    stdays = []
+    st_days = []
     for day in days:
         name = day.xpath("td[1]")[0]
 ##        print name.text
@@ -49,7 +48,7 @@ def parse(tablestring, needsubgroup=None, needweek=None):
 ##        print subgroups
         subjects = [subject.text for subject in day.xpath("td[5]")[0]]
 ##        print subjects
-        lessontypes = [lessontype.text for lessontype in day.xpath("td[6]")[0]]
+        lesson_types = [lessontype.text for lessontype in day.xpath("td[6]")[0]]
 ##        print lessontypes
         places = [place.text for place in day.xpath("td[7]")[0]]
 ##        print places
@@ -59,15 +58,16 @@ def parse(tablestring, needsubgroup=None, needweek=None):
         for i in range(len(subjects)):
 
             les = models.Lesson(weeks[i], times[i], subgroups[i], subjects[i],
-                                lessontypes[i], places[i], lecturers[i])
+                                lesson_types[i], places[i], lecturers[i])
             lessons.append(les)
-        stday = models.StudyDay(lessons, name.text)
-        stdays.append(stday)
-    stweek = models.StudyWeek(stdays)
-    return stweek
+        st_day = models.StudyDay(lessons, name.text)
+        st_days.append(st_day)
+    st_week = models.StudyWeek(st_days)
+    return st_week
 
-def getweeknum(year, month, day):
-    '''Return week number'''
+
+def get_week_num(year, month, day):
+    """Return week number"""
     try:
         if month >= 9:
             startday = datetime.date(year, 9, 1)
@@ -78,6 +78,7 @@ def getweeknum(year, month, day):
         return ((newweek - startweek) % 4) +1
     except Exception:
         return None
+
 
 def subgroup2int(subgroup_str):
     """Convert subgroup string to int with Value Error handling"""
