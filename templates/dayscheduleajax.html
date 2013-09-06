@@ -7,7 +7,7 @@
           {% if subgroup and subgroup != 0 %}
           Подгруппа <span class="text-info">{{ subgroup }}</span> <br />         
           {% endif %}
-          {{ studyday.getFullName }}
+          {{ studyday.get_full_name }}
           <span class="text-info"> {{ target_date|date:"d-m-Y" }}</span><br />
           Неделя <span class="text-info"> {{ weeknum }}</span>
       </div>
@@ -19,37 +19,37 @@
 <tr>
   <td>
     {% for lesson in studyday  %}
-        <div>{{ lesson.getweeks }}<br></div>
+        <div>{{ lesson.get_weeks_str }}<br></div>
     {% endfor %}
   </td>
   <td>
     {% for lesson in studyday  %}
-        <div>{{ lesson.gettime }}<br></div>
+        <div>{{ lesson.get_time_str }}<br></div>
     {% endfor %}
   </td>
   <td>
     {% for lesson in studyday  %}
-        <div>{{ lesson.getsubgroup }}<br></div>
+        <div>{{ lesson.get_subgroup_str }}<br></div>
     {% endfor %}
   </td>
   <td>
     {% for lesson in studyday  %}
-        <div {% if lesson.getlessontype != "лк" %}class="practical_lesson"{% endif %}>{{ lesson.getsubject }}<br></div>
+        <div {% if not lesson.get_lesson_type_object.is_lec %}class="practical_lesson"{% endif %}>{{ lesson.get_subject_str }}<br></div>
     {% endfor %}
   </td>
   <td>
     {% for lesson in studyday  %}
-        <div>{{ lesson.getlessontype }}<br></div>
+        <div>{{ lesson.get_lesson_type_str }}<br></div>
     {% endfor %}
   </td>
   <td>
     {% for lesson in studyday  %}
-        <div>{{ lesson.getplace }}<br></div>
+        <div>{{ lesson.get_place_str }}<br></div>
     {% endfor %}
   </td>
   <td>
     {% for lesson in studyday  %}
-        <div>{{ lesson.getlecturer }}<br></div>
+        <div>{{ lesson.get_lecturer_str }}<br></div>
     {% endfor %}
   </td>
 </tr>
