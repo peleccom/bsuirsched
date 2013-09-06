@@ -185,7 +185,7 @@ class StudyDay(object):
         new_lessons = []
         if subgroup:
             for lesson in self:
-                sb = lesson.get_subgroup_str()
+                sb = lesson.get_subgroup()
                 if not sb or sb == subgroup:
                     new_lessons_0.append(lesson)
         else:
