@@ -11,8 +11,12 @@
 <table class="table table-bordered table-condensed table-striped table-hover">
 <caption>
   <div class="well">
-      Расписание группы <span class="text-info"> {{group}} </span> 
-  {% if subgroup != 0 and subgroup %}
+      {% if current_week %}
+          Сейчас <span class="text-info">{{ current_week }}</span> неделя
+          <br>
+      {% endif %}
+      Расписание группы <span class="text-info"> {{group}} </span>
+      {% if subgroup != 0 and subgroup %}
   <br>
   Подгруппа <span class="text-info">{{ subgroup }}</span>
   {% endif %}

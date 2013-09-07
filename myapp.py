@@ -228,6 +228,7 @@ class GroupSchedulePage(webapp2.RequestHandler):
                 return
             study_week = groupdata[DICTDATA_SCHEDULE_KEY_NAME]
             if study_week:
+                localised_date = pytz.utc.localize(groupdata["date"]).astimezone(minsk_tz)
                 study_week = study_week.filter(subgroup, week_num)
                 path = os.path.join(os.path.dirname(__file__),
                                     'templates', 'schedule.html')
@@ -236,7 +237,8 @@ class GroupSchedulePage(webapp2.RequestHandler):
                                         "selweek": week_num,
                                         "weeknumbers": range(1, 5),
                                         "default_group": get_preferred_group_params(self.request),
-                "fetcheddate": pytz.utc.localize(groupdata["date"]).astimezone(minsk_tz)
+                "fetcheddate": localised_date,
+                "current_week" : bsuirparser.get_week_num(localised_date.year, localised_date.month, localised_date.day)
                                         })
                                         )
             else:
