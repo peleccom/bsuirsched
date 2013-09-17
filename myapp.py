@@ -11,7 +11,7 @@ import datetime
 import urllib
 
 
-from pytz.gae import pytz
+from gaepytz.gae import pytz
 
 # os.environ['DJANGO_SETTINGS_MODULE'] = 'conf.settings'
 # from django.conf import settings
@@ -229,6 +229,7 @@ class GroupSchedulePage(webapp2.RequestHandler):
             study_week = groupdata[DICTDATA_SCHEDULE_KEY_NAME]
             if study_week:
                 localised_date = pytz.utc.localize(groupdata["date"]).astimezone(minsk_tz)
+                now_date = (datetime.datetime.now(tz = pytz.utc)).astimezone(minsk_tz)
                 study_week = study_week.filter(subgroup, week_num)
                 path = os.path.join(os.path.dirname(__file__),
                                     'templates', 'schedule.html')
@@ -238,7 +239,7 @@ class GroupSchedulePage(webapp2.RequestHandler):
                                         "weeknumbers": range(1, 5),
                                         "default_group": get_preferred_group_params(self.request),
                 "fetcheddate": localised_date,
-                "current_week" : bsuirparser.get_week_num(localised_date.year, localised_date.month, localised_date.day)
+                "current_week" : bsuirparser.get_week_num(now_date.year, now_date.month, now_date.day)
                                         })
                                         )
             else:
