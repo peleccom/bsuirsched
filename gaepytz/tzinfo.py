@@ -7,7 +7,7 @@ try:
 except NameError:
     from sets import Set as set
 
-import pytz
+import gaepytz as pytz
 
 __all__ = []
 

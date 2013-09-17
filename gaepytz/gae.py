@@ -25,7 +25,7 @@
 """
 import os
 import logging
-import pytz
+import gaepytz as pytz
 import zipfile
 from cStringIO import StringIO
 
