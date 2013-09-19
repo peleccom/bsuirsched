@@ -308,6 +308,7 @@ class NotFoundPage(webapp2.RequestHandler):
                                         {
                                         "default_group": get_preferred_group_params(self.request)
                                         }))
+        self.response.set_status(404)
 
 app = webapp2.WSGIApplication([
                                 (r'/(home)?', MainPage),
