@@ -11,10 +11,7 @@
 <table class="table table-bordered table-condensed table-striped table-hover">
 <caption>
   <div class="well">
-      {% if current_week %}
-          Сейчас <span class="text-info">{{ current_week }}</span> неделя
-          <br>
-      {% endif %}
+
       Расписание группы <span class="text-info"> {{group}} </span>
       {% if subgroup != 0 and subgroup %}
   <br>
@@ -25,6 +22,10 @@
   Неделя <span class="text-info">{{ selweek }}  </span>
   {% endif %}
   </div>
+    {% if current_week %}
+        <div class="pull-right "><em>Сейчас <span class="text-info">{{ current_week }}</span> неделя</em></div>
+        <br>
+    {% endif %}
   <br>
 </caption>
 {% for day in week %}
@@ -76,6 +77,7 @@
 </tbody>
 </table>
 <br>
+
 <form action="weekschedule" method="get" class="form-inline pagination-centered">
   <fieldset>
     <legend>Расписание на неделю</legend>

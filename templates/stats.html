@@ -74,6 +74,9 @@
                         legend: { show:true, location: 'e' }
                     }
             );
+            $(window).resize(function() {
+                plot1.replot( { resetAxes: true } );
+            });
         });
     </script>
 {% endblock AdditionalJS %}

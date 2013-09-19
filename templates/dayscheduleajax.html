@@ -1,5 +1,4 @@
 <div class="well">
-{% if studyday %}
 <table class="table table-bordered table-condensed table-striped table-hover">
   <caption>
       <div class="well">
@@ -12,6 +11,7 @@
           Неделя <span class="text-info"> {{ weeknum }}</span>
       </div>
   </caption>
+    {% if studyday and studyday.lessons %}
   <thead>
     <tr><th>Недели</th><th>Время</th><th>Подгр.</th><th>Предмет</th><th>Тип</th><th>Аудит.</th><th>Преподаватель</th></tr>
   </thead>
@@ -57,6 +57,7 @@
 </table>
 <small class="pull-right text-info">Последнее обновление с bsuir.by расписания для этой группы : {{ fetcheddate|date:"d.m.Y H:i:s" }}</small>
 {% else %}
+</table>
 {% if target_date %} {# Есть дата значит данные получены но это не учебный день #}
 <div class="pagination-centered text-warning">Нет занятий </div>
 {% else %} {# !target_date and ! study_day#}
