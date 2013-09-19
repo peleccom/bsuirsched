@@ -14,6 +14,9 @@ handlers:
 - url: /admin.*
   script: admin.app
   login: admin
+- url: /tasks/.*
+  script: tasks.app
+  login: admin
 - url: .*
   script: myapp.app
 libraries:
