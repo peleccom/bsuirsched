@@ -152,6 +152,7 @@ class TestGlobalFunctions(unittest.TestCase):
         self.assertEqual(2, bsuirparser.get_week_num(2012,9,3))
         self.assertEqual(4, bsuirparser.get_week_num(2013,2,9))
         self.assertEqual(None, bsuirparser.get_week_num(2013,40,40))
+        self.assertEqual(2, bsuirparser.get_week_num(2014, 9, 1))
 
     def testFullWeekDayNames(self):
         studyweek = bsuirparser.parse(self.testdata)

@@ -7,7 +7,7 @@ import urllib
 import logging
 import datetime
 import models
-
+from datetime import timedelta
 
 def fetch(group):
     u'''Скачать HTML с расписанием с bsuir.
@@ -65,18 +65,19 @@ def parse(tablestring):
     st_week = models.StudyWeek(st_days)
     return st_week
 
+def weeks_between(d1, d2):
+    monday1 = (d1 - timedelta(days=d1.weekday()))
+    monday2 = (d2 - timedelta(days=d2.weekday()))
+    return (monday2 - monday1).days / 7
 
 def get_week_num(year, month, day):
     """Return week number"""
     try:
-        if month >= 9:
-            startday = datetime.date(year, 9, 1)
-        else:
-            startday = datetime.date(year-1, 9, 1)
-        newweek = datetime.date(year, month, day).isocalendar()[1]
-        startweek = startday.isocalendar()[1]
-        return ((newweek - startweek) % 4) +1
-    except Exception:
+        date_start = datetime.date(2012, 9 , 1)
+	date_end = datetime.date(year, month, day)
+	weeks = weeks_between(date_start, date_end)
+	return 1 + (weeks % 4)
+    except:
         return None
 
 
